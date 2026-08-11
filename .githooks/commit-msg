@@ -1,0 +1,24 @@
+#!/bin/sh
+# commit-msg hook: enforce commit message pattern "#123456: message detail"
+# Usage: git will call this hook with the path to the temp commit message file
+
+MSG_FILE="$1"
+if [ -z "$MSG_FILE" ]; then
+  echo "ERROR: No commit message file provided to commit-msg hook." >&2
+  exit 1
+fi
+
+# Read first line of the commit message (ignore leading/trailing CR/LF)
+FIRST_LINE="$(sed -n '1p' "$MSG_FILE" | tr -d '\r\n')"
+
+# Pattern: # followed by exactly 6 digits, then colon and a space, then message
+if echo "$FIRST_LINE" | grep -Eq '^#[0-9]{6}: .+'; then
+  exit 0
+fi
+
+cat <<EOF >&2
+ERROR: Invalid commit message format.
+Commit messages must start with: "#123456: message detail"
+Example: "#012345: Fix user lookup bug"
+EOF
+exit 1
