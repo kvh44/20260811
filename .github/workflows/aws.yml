@@ -31,7 +31,7 @@ on:
     branches: [ "main" ]
 
 env:
-  AWS_REGION: "cluster20260811"                   # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: ${{ env.AWS_REGION }}                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: "test"           # set this to your Amazon ECR repository name
   ECS_SERVICE: "task-definition-20260811-service-tw4mqndc"                 # set this to your Amazon ECS service name
   ECS_CLUSTER: "arn:aws:ecs:ca-central-1:878915883825:cluster/cluster20260811"                 # set this to your Amazon ECS cluster name
