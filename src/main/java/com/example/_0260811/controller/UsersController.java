@@ -15,7 +15,8 @@ public class UsersController {
     public List<User> listUsers() {
         return List.of(
                 new User(1L, "Alice"),
-                new User(2L, "Bob")
+                new User(2L, "Bob"),
+                new User(3L, "Charlie")
         );
     }
 }
