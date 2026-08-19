@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: 20260819
+  labels:
+    app: 20260819
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: 20260819
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: 20260819
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: 20260819
+        # IMAGE_PLACEHOLDER is replaced in CI with the built image (see .github/workflows/eks-deploy.yml)
+        image: IMAGE_PLACEHOLDER
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8001
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8001
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8001
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
