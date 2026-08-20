@@ -62,5 +62,28 @@ Notes
 - To change behavior or request more documentation, open an issue or ask here.
 
 
-Other:
+
+Eks:
+# Refresh kubeconfig if needed
+aws eks update-kubeconfig \
+--profile default \
+--region ca-central-1 \
+--name eks-cluster-20260819
+
+# List pods
+kubectl get pods --all-namespaces
+
+# Inspect a pod
+kubectl describe pod -n default 20260819-7cd5fb6c48-hp6l6
+
+# Read logs
+kubectl logs -n default 20260819-7cd5fb6c48-hp6l6 --all-containers
+
+# Open a shell when the pod is Running
+kubectl exec -it -n default 20260819-7cd5fb6c48-hp6l6 -- /bin/sh
+
+# Access the application locally
+kubectl port-forward -n default pod/20260819-7cd5fb6c48-hp6l6 8001:8001
+
+Others:
 Expose Ecs on public internet: https://www.youtube.com/watch?v=3b1--mUhUhI
