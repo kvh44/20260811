@@ -10,10 +10,7 @@ spec:
     matchLabels:
       app: "20260819"
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: "100%"
-      maxUnavailable: "0%"
+    type: Recreate
   template:
     metadata:
       labels:
