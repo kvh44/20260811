@@ -39,14 +39,14 @@ spec:
             memory: "256Mi"
         livenessProbe:
           httpGet:
-            path: /
+            path: /users
             port: 8001
           initialDelaySeconds: 10
           periodSeconds: 10
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /
+            path: /users
             port: 8001
           initialDelaySeconds: 5
           periodSeconds: 10
