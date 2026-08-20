@@ -60,6 +60,6 @@ jobs:
           ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # Substitute the dynamic image tag inside your manifest file
+          # Use | as delimiter instead of / to avoid conflicts with URL paths
           sed -i "s|IMAGE_PLACEHOLDER|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s/deployment.yaml
           kubectl apply -f k8s/deployment.yaml
