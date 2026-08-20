@@ -13,7 +13,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: "100%"
-      maxUnavailable: "0"
+      maxUnavailable: "0%"
     # Ensures new pods are created before old pods are terminated to preserve availability
     # Consider 'Recreate' strategy if you want to kill all old pods before creating new ones (causes downtime)
   template:
