@@ -10,10 +10,7 @@ spec:
     matchLabels:
       app: "20260819"
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: "100%"
-      maxUnavailable: "0%"
+    type: Recreate
   template:
     metadata:
       labels:
@@ -39,14 +36,14 @@ spec:
             memory: "256Mi"
         livenessProbe:
           httpGet:
-            path: /
+            path: /users
             port: 8001
           initialDelaySeconds: 10
           periodSeconds: 10
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /
+            path: /users
             port: 8001
           initialDelaySeconds: 5
           periodSeconds: 10
