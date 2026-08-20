@@ -37,6 +37,25 @@ CI
 --
 GitHub Actions workflow at .github/workflows/maven.yml uses Java 26 and runs package via ./mvnw or ./mvnw replacement. Dependency-graph upload is tolerant to disabled repos.
 
+AWS EKS deployment
+------------------
+The EKS workflow uses GitHub OIDC, so it does not require long-lived AWS access keys.
+
+1. Deploy the IAM role and EKS access entry:
+   aws cloudformation deploy \
+     --profile default \
+     --region ca-central-1 \
+     --stack-name github-actions-oidc-20260811 \
+     --template-file .aws/github-actions-oidc-role.yml \
+     --capabilities CAPABILITY_NAMED_IAM
+2. In GitHub, open Settings > Secrets and variables > Actions > Variables and set:
+   AWS_ROLE_TO_ASSUME=arn:aws:iam::878915883825:role/GitHubActionsEKSDeploy-20260811
+   AWS_REGION=ca-central-1
+   ECR_REPOSITORY=test
+   EKS_CLUSTER_NAME=eks-cluster-20260819
+
+The role trust policy accepts OIDC tokens only from the main branch of this repository. Its AWS permissions are limited to pushing images to the test ECR repository and describing the EKS cluster. Kubernetes access is limited to edit operations in the default namespace.
+
 Notes
 -----
 - If container build fails due to environment/OOM/thread limits, build locally and use the runtime Dockerfile (copies jar).

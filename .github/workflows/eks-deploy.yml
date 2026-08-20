@@ -30,7 +30,7 @@ jobs:
       - name: Configure AWS Credentials
         # AWS_ROLE_TO_ASSUME should be the ARN of the IAM role that GitHub OIDC will assume,
         # for example: arn:aws:iam::123456789012:role/ci-cd-github-oidc-role
-        # Store that ARN in the repository or organization secrets as AWS_ROLE_TO_ASSUME.
+        # Store that ARN in the repository or organization variables as AWS_ROLE_TO_ASSUME.
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
