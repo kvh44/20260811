@@ -85,5 +85,12 @@ kubectl exec -it -n default 20260819-7cd5fb6c48-hp6l6 -- /bin/sh
 # Access the application locally
 kubectl port-forward -n default pod/20260819-7cd5fb6c48-hp6l6 8001:8001
 
+# Delete pods to force recreation (e.g., after changing the image):
+kubectl delete pods -n default -l app=20260819
+# Scale down to 0 replicas to stop the deployment:
+kubectl scale deployment/20260819 --replicas=0 -n default
+# Scale up to 2 replicas to start the deployment:
+kubectl scale deployment/20260819 --replicas=2 -n default
+
 Others:
 Expose Ecs on public internet: https://www.youtube.com/watch?v=3b1--mUhUhI
