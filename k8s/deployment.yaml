@@ -40,10 +40,11 @@ spec:
           httpGet:
             path: /actuator/health/readiness
             port: http
-          initialDelaySeconds: 15
+          initialDelaySeconds: 30
           periodSeconds: 5
           timeoutSeconds: 2
           failureThreshold: 30
+          successThreshold: 1
         livenessProbe:
           httpGet:
             path: /actuator/health/liveness
