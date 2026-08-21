@@ -8,6 +8,6 @@ spec:
     app: "20260819"
   ports:
     - protocol: TCP
-      port: 80
+      port: 8001
       targetPort: 8001
   type: LoadBalancer   # Use ClusterIP if only internal access is needed
