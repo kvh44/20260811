@@ -82,6 +82,9 @@ kubectl logs -n default 20260819-7cd5fb6c48-hp6l6 --all-containers
 # Open a shell when the pod is Running
 kubectl exec -it -n default 20260819-7cd5fb6c48-hp6l6 -- /bin/sh
 
+# Read logs for a specific pod
+kubectl logs 20260819-bcbf7d5f7-87trf
+
 # Access the application locally
 kubectl port-forward -n default pod/20260819-7cd5fb6c48-hp6l6 8001:8001
 
