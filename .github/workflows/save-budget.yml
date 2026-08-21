@@ -54,7 +54,7 @@ jobs:
       - name: Scale ECS and EKS workloads
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_PROFILE: "default"
+          AWS_PROFILE: ${{ vars.AWS_PROFILE }}
           ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
           ECS_SERVICE: ${{ vars.ECS_SERVICE }}
           K8S_DEPLOYMENT: ${{ vars.K8S_DEPLOYMENT }}

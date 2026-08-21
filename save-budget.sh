@@ -39,7 +39,7 @@ K8S_NAMESPACE="${K8S_NAMESPACE:-default}"
 ECS_CLUSTER="${ECS_CLUSTER:-cluster20260811}"
 ECS_SERVICE="${ECS_SERVICE:-ecs-service-20260818}"
 AWS_REGION="${AWS_REGION:-ca-central-1}"
-AWS_PROFILE="${AWS_PROFILE-default}"
+AWS_PROFILE="${AWS_PROFILE}"
 
 AWS_CLI_ARGS=(--region "${AWS_REGION}")
 if [[ -n "${AWS_PROFILE}" ]]; then
