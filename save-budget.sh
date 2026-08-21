@@ -39,12 +39,6 @@ K8S_NAMESPACE="${K8S_NAMESPACE:-default}"
 ECS_CLUSTER="${ECS_CLUSTER:-cluster20260811}"
 ECS_SERVICE="${ECS_SERVICE:-ecs-service-20260818}"
 AWS_REGION="${AWS_REGION:-ca-central-1}"
-AWS_PROFILE="${AWS_PROFILE}"
-
-AWS_CLI_ARGS=(--region "${AWS_REGION}")
-if [[ -n "${AWS_PROFILE}" ]]; then
-  AWS_CLI_ARGS+=(--profile "${AWS_PROFILE}")
-fi
 
 echo "Setting Kubernetes deployment ${K8S_DEPLOYMENT} in namespace ${K8S_NAMESPACE} to ${K8S_REPLICAS} replica(s)..."
 kubectl scale deployment/"${K8S_DEPLOYMENT}" --replicas="${K8S_REPLICAS}" -n "${K8S_NAMESPACE}"
@@ -53,7 +47,6 @@ echo "Updating ECS service ${ECS_SERVICE} in cluster ${ECS_CLUSTER} to desired c
 aws ecs update-service \
   --cluster "${ECS_CLUSTER}" \
   --service "${ECS_SERVICE}" \
-  --desired-count "${ECS_DESIRED_COUNT}" \
-  "${AWS_CLI_ARGS[@]}"
+  --desired-count "${ECS_DESIRED_COUNT}"
 
 echo "Done: action=${action} (replicas=${K8S_REPLICAS}, desired-count=${ECS_DESIRED_COUNT})."

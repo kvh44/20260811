@@ -64,6 +64,10 @@ Notes
 
 
 Eks:
+# View current AWS CLI configuration
+aws configure list
+aws configure list-profiles
+
 # Refresh kubeconfig if needed
 aws eks update-kubeconfig \
 --profile default \
