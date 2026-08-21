@@ -38,21 +38,22 @@ spec:
             memory: "256Mi"
         startupProbe:
           httpGet:
-            path: /users
+            path: /actuator/health/readiness
             port: http
+          initialDelaySeconds: 15
           periodSeconds: 5
           timeoutSeconds: 2
           failureThreshold: 30
         livenessProbe:
           httpGet:
-            path: /users
+            path: /actuator/health/liveness
             port: http
           periodSeconds: 10
           timeoutSeconds: 2
           failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /users
+            path: /actuator/health/readiness
             port: http
           periodSeconds: 5
           timeoutSeconds: 2
