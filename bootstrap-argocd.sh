@@ -15,14 +15,14 @@ for command_name in aws kubectl helm; do
   fi
 done
 
-#AWS_CLI_ARGS=(--region "${AWS_REGION}")
-#if [[ -n "${AWS_PROFILE}" ]]; then
-#  AWS_CLI_ARGS+=(--profile "${AWS_PROFILE}")
-#fi
+AWS_CLI_ARGS=(--region "${AWS_REGION}")
+if [[ -n "${AWS_PROFILE}" ]]; then
+  AWS_CLI_ARGS+=(--profile "${AWS_PROFILE}")
+fi
 
 echo "AWS_PROFILE: ${AWS_PROFILE}"
 echo "Connecting kubectl to ${EKS_CLUSTER_NAME} in ${AWS_REGION}..."
-aws eks update-kubeconfig --name "${EKS_CLUSTER_NAME}"
+aws "${AWS_CLI_ARGS[@]}" eks update-kubeconfig --name "${EKS_CLUSTER_NAME}"
 
 echo "Installing Argo CD chart ${ARGOCD_CHART_VERSION}..."
 helm repo add argo https://argoproj.github.io/argo-helm --force-update
