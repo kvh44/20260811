@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 AWS_REGION="${AWS_REGION:-ca-central-1}"
-AWS_PROFILE="${AWS_PROFILE-default}"
+AWS_PROFILE="${AWS_PROFILE:-default}"
 EKS_CLUSTER_NAME="${EKS_CLUSTER_NAME:-eks-cluster-20260819}"
 ARGOCD_CHART_VERSION="${ARGOCD_CHART_VERSION:-10.2.1}"
 
