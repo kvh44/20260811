@@ -1,4 +1,4 @@
-name: Deploy Spring Boot to AWS EKS
+name: Deploy Helm to AWS EKS
 
 on:
   push:
