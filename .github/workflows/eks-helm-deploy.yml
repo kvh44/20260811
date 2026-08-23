@@ -42,6 +42,16 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v5.1.0
+        with:
+          version: v1.36.3
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v5.0.1
+        with:
+          version: v4.2.4
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -77,3 +87,11 @@ jobs:
           git commit -m "#${TIMESTAMP}: deploy EKS image ${IMAGE_TAG}"
           git pull --rebase origin main
           git push
+
+      - name: Bootstrap Argo CD on EKS
+        env:
+          AWS_PROFILE: ""
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+          ARGOCD_CHART_VERSION: "10.2.1"
+        run: ./bootstrap-argocd.sh
