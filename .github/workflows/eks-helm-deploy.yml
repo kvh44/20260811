@@ -70,7 +70,10 @@ jobs:
           fi
 
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.email "bryant.qin@gmail.com"
+          # timestamp in yyyymmddHHMMSS
+          TIMESTAMP="$(date +%Y%m%d%H%M%S)"
           git add -- "${VALUES_FILE}"
-          git commit -m "#202608: deploy EKS image ${IMAGE_TAG}"
+          git commit -m "#${TIMESTAMP}: deploy EKS image ${IMAGE_TAG}"
+          git pull --rebase origin main
           git push
