@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: users-api
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kvh44/20260811.git
+    targetRevision: main
+    path: helm/20260819
+    helm:
+      releaseName: users-api
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  ignoreDifferences:
+    # save-budget.sh controls replicas at 08:00 and 20:00. Argo CD should
+    # continue reconciling every other Deployment field without undoing it.
+    - group: apps
+      kind: Deployment
+      name: "20260819"
+      namespace: default
+      jsonPointers:
+        - /spec/replicas
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+

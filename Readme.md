@@ -99,5 +99,66 @@ kubectl scale deployment/20260819 --replicas=0 -n default
 # Scale up to 2 replicas to start the deployment:
 kubectl scale deployment/20260819 --replicas=2 -n default
 
+
+
+AWS EKS deployment with Helm and Argo CD
+-----------------------------------------
+The Kubernetes Deployment and Service are packaged in `helm/20260819`. Argo CD
+tracks that chart on the `main` branch and continuously reconciles it into the
+EKS `default` namespace.
+
+The EKS workflow uses GitHub OIDC, so it does not require long-lived AWS access
+keys. CI builds and pushes the image, commits the new tag to the Helm values,
+and lets Argo CD perform the deployment. CI no longer runs `kubectl apply`.
+
+1. Deploy the IAM role and EKS access entry:
+   aws cloudformation deploy \
+   --profile default \
+   --region ca-central-1 \
+   --stack-name github-actions-oidc-20260811 \
+   --template-file .aws/github-actions-oidc-role.yml \
+   --capabilities CAPABILITY_NAMED_IAM
+2. In GitHub, open Settings > Secrets and variables > Actions > Variables and set:
+   AWS_ROLE_TO_ASSUME=arn:aws:iam::878915883825:role/GitHubActionsEKSDeploy-20260811
+   AWS_REGION=ca-central-1
+   ECR_REPOSITORY=test
+   EKS_CLUSTER_NAME=eks-cluster-20260819
+
+3. Install Helm locally, then bootstrap Argo CD after this branch is merged to
+   `main`:
+   brew install helm
+   ./bootstrap-argocd.sh
+
+4. Check synchronization:
+   kubectl get applications -n argocd
+   kubectl get pods -n argocd
+   kubectl get deployment,service -n default
+
+Access the Argo CD UI locally:
+kubectl port-forward service/argargocdocd-server -n argocd 8080:443
+
+Then open https://localhost:8080. Retrieve the initial admin password with:
+kubectl get secret argocd-initial-admin-secret -n argocd \
+-o jsonpath='{.data.password}' | base64 --decode; echo
+
+Validate the application chart before committing changes:
+helm lint helm/20260819
+helm template users-api helm/20260819
+
+The role trust policy accepts OIDC tokens only from the main branch of this
+repository. Argo CD owns the live application resources; changes to the chart
+or its values are the desired state.
+
+The Argo CD Application ignores only `/spec/replicas` on deployment `20260819`.
+This allows `save-budget.sh` to scale the application to zero overnight without
+Argo CD immediately restoring it. Argo CD's own pods remain online and continue
+to consume a small amount of EKS worker capacity.
+
+Notes
+-----
+- If container build fails due to environment/OOM/thread limits, build locally and use the runtime Dockerfile (copies jar).
+- To change behavior or request more documentation, open an issue or ask here.
+
+
 Others:
 Expose Ecs on public internet: https://www.youtube.com/watch?v=3b1--mUhUhI

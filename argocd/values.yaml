@@ -1,0 +1,46 @@
+# Single-cluster development configuration. Argo CD remains available while
+# the users API is scaled to zero by save-budget.sh.
+crds:
+  keep: true
+
+dex:
+  enabled: false
+
+applicationSet:
+  enabled: false
+
+notifications:
+  enabled: false
+
+redis-ha:
+  enabled: false
+
+controller:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+repoServer:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+server:
+  replicas: 1
+  service:
+    type: ClusterIP
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+

@@ -1,0 +1,7 @@
+apiVersion: v2
+name: users-api
+description: Helm chart for the Spring Boot users API on Amazon EKS
+type: application
+version: 0.1.0
+appVersion: "0.0.1"
+
