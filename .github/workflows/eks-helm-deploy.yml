@@ -90,7 +90,6 @@ jobs:
 
       - name: Bootstrap Argo CD on EKS
         env:
-          AWS_PROFILE: "${{ vars.AWS_PROFILE }}"
           AWS_REGION: ${{ vars.AWS_REGION }}
           EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
           ARGOCD_CHART_VERSION: "10.2.1"

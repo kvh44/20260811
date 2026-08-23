@@ -20,6 +20,7 @@ if [[ -n "${AWS_PROFILE}" ]]; then
   AWS_CLI_ARGS+=(--profile "${AWS_PROFILE}")
 fi
 
+echo "AWS_PROFILE: ${AWS_PROFILE}"
 echo "Connecting kubectl to ${EKS_CLUSTER_NAME} in ${AWS_REGION}..."
 aws "${AWS_CLI_ARGS[@]}" eks update-kubeconfig --name "${EKS_CLUSTER_NAME}"
 
