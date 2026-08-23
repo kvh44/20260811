@@ -1,0 +1,61 @@
+replicaCount: 1
+
+fullnameOverride: "20260819"
+
+image:
+  repository: 878915883825.dkr.ecr.ca-central-1.amazonaws.com/test
+  tag: "dd246d0764abf129ce2987c2f7c1bed0751e0c5b"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+service:
+  enabled: true
+  name: users-api
+  type: ClusterIP
+  port: 8001
+  targetPort: http
+
+env:
+  - name: SERVER_PORT
+    value: "8001"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+startupProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 30
+  successThreshold: 1
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: http
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: http
+  periodSeconds: 5
+  timeoutSeconds: 2
+  failureThreshold: 3
+
+podAnnotations: {}
+podLabels: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
