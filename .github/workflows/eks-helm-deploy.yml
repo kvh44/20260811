@@ -88,9 +88,9 @@ jobs:
           git pull --rebase origin main
           git push
 
-      - name: Bootstrap Argo CD on EKS
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
-          ARGOCD_CHART_VERSION: "10.2.1"
-        run: ./bootstrap-argocd.sh
+#      - name: Bootstrap Argo CD on EKS
+#        env:
+#          AWS_REGION: ${{ vars.AWS_REGION }}
+#          EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+#          ARGOCD_CHART_VERSION: "10.2.1"
+#        run: ./bootstrap-argocd.sh
