@@ -6,6 +6,19 @@ spring:
   web:
     resources:
       add-mappings: false
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/appdb}
+    username: ${DB_USERNAME:appuser}
+    password: ${DB_PASSWORD:apppassword}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  sql:
+    init:
+      mode: never
 
 server:
   port: 8001
