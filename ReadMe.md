@@ -33,9 +33,6 @@ Git hooks
 Install local commit-msg hook (enforces "#123456: message detail"):
   ./install-hooks.sh
 
-CI
---
-GitHub Actions workflow at .github/workflows/maven.yml uses Java 26 and runs package via ./mvnw or ./mvnw replacement. Dependency-graph upload is tolerant to disabled repos.
 
 AWS EKS deployment
 ------------------
@@ -91,6 +88,7 @@ kubectl logs 20260819-bcbf7d5f7-87trf
 
 # Access the application locally
 kubectl port-forward -n default pod/20260819-7cd5fb6c48-hp6l6 8001:8001
+kubectl port-forward -n default service/20260819-svc  8001:8001
 
 # Delete pods to force recreation (e.g., after changing the image):
 kubectl delete pods -n default -l app=20260819
