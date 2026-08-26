@@ -160,5 +160,28 @@ Notes
 - To change behavior or request more documentation, open an issue or ask here.
 
 
+Use Mysql in docker
+-------------------------
+Start mysql in docker:
+docker compose up -d
+docker compose ps
+
+Log:
+docker compose logs -f mysql
+
+Test connection mysal:
+docker compose exec mysql mysql -u appuser -p
+password: apppassword
+
+Create DB:
+docker compose exec -T mysql mysql -u appuser -papppassword < init.mysql.sql
+
+Stop docker:
+docker compose down
+
+Stop docker and delete data:
+docker compose down -v
+
 Others:
+-------------------------
 Expose Ecs on public internet: https://www.youtube.com/watch?v=3b1--mUhUhI

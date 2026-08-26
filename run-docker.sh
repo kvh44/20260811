@@ -8,6 +8,6 @@ export PATH="$JAVA_HOME/bin:$PATH"
 
 docker build -t 20260811 .
 docker rm -f 20260811-container >/dev/null 2>&1 || true
-docker run -d --name 20260811-container -p 8001:8001 20260811
+docker run -e SPRING_PROFILES_ACTIVE=local -d --name 20260811-container -p 8001:8001 20260811
 
 echo "Container started. Check with: curl http://localhost:8001/users"

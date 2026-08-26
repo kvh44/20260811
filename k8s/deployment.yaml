@@ -25,6 +25,8 @@ spec:
         env:
         - name: SERVER_PORT
           value: "8001"
+        - name: SPRING_PROFILES_ACTIVE
+          value: "local"
         ports:
         - name: http
           containerPort: 8001
