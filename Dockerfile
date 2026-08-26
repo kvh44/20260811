@@ -15,4 +15,5 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
 
 EXPOSE 8001
+ENV SPRING_PROFILES_ACTIVE=local
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
