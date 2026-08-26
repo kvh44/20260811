@@ -39,7 +39,7 @@ env:
                                                # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: ${{ vars.CONTAINER_NAME }}          # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
-
+  SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
 permissions:
   contents: read
 
