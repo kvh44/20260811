@@ -168,8 +168,7 @@ Log:
 docker compose logs -f mysql
 
 Test connection mysal:
-docker compose exec mysql mysql -u appuser -p
-password: apppassword
+docker compose exec mysql mysql -u appuser -papppassword
 
 Create DB:
 docker compose exec -T mysql mysql -u appuser -papppassword < init.mysql.sql
