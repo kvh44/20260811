@@ -29,12 +29,19 @@ jobs:
   deploy_ecs:
     if: inputs.deployECS == true
     uses: ./.github/workflows/ecs-deploy.yml
+    with:
+      deploy: ${{ inputs.deployECS }}
+      environment: ${{ inputs.environment }}
     secrets: inherit
   deploy_eks:
     if: inputs.deployEKS == true
     uses: ./.github/workflows/eks-deploy.yml
+    with:
+      deploy: ${{ inputs.deployEKS }}
     secrets: inherit
   deploy_helm:
     if: inputs.deployHELM == true
     uses: ./.github/workflows/eks-helm-deploy.yml
+    with:
+      deploy: ${{ inputs.deployHELM }}
     secrets: inherit

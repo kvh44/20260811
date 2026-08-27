@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+  workflow_call:
+    inputs:
+      deploy:
+        description: "Deploy EKS?"
+        required: true
+        type: boolean
 
 permissions:
   id-token: write
