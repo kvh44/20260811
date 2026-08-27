@@ -160,16 +160,19 @@ Notes
 
 Use Mysql in docker
 -------------------------
-Start mysql in docker:
-docker compose up -d
+Start app and mysql in docker:
+docker compose -f compose.app.yml -f compose.mysql.yml up --build
 docker compose ps
+
+Or start seperately:
+docker compose -f compose.mysql.yml up --build
+
 
 Log:
 docker compose logs -f mysql
 
 Test connection mysal:
-docker compose exec mysql mysql -u appuser -p
-password: apppassword
+docker compose exec mysql mysql -u appuser -papppassword
 
 Create DB:
 docker compose exec -T mysql mysql -u appuser -papppassword < init.mysql.sql
