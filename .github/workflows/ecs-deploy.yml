@@ -29,16 +29,6 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches: [ "main" ]
-  workflow_call:
-    inputs:
-      environment:
-        description: "Environment"
-        required: true
-        type: string
-      deploy:
-        description: "Deploy application?"
-        required: true
-        type: boolean
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}             # set this to your preferred AWS region, e.g. us-west-1
