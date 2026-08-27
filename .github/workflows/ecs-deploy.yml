@@ -29,16 +29,6 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches: [ "main" ]
-  workflow_call:
-    inputs:
-      deploy:
-        description: "Deploy ECS?"
-        required: true
-        type: boolean
-      environment:
-        description: "Environment"
-        required: true
-        type: string
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}             # set this to your preferred AWS region, e.g. us-west-1
@@ -56,7 +46,6 @@ permissions:
 jobs:
   deploy:
     name: Deploy
-    if: inputs.deploy == true
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
 
