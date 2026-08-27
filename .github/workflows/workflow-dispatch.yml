@@ -10,16 +10,31 @@ on:
         options:
           - local
           - production
-      deploy:
-        description: "Deploy application?"
+      deployECS:
+        description: "Deploy ECS?"
         required: true
         type: boolean
         default: true
-
+      deployEKS:
+        description: "Deploy EKS?"
+        required: true
+        type: boolean
+        default: true
+      deployHELM:
+        description: "Deploy HELM?"
+        required: true
+        type: boolean
+        default: true
 jobs:
   deploy_ecs:
+    if: inputs.deployECS == true
     uses: ./.github/workflows/ecs-deploy.yml
-    with:
-      deploy: ${{ inputs.deploy }}
-      environment: ${{ inputs.environment }}
+    secrets: inherit
+  deploy_eks:
+    if: inputs.deployEKS == true
+    uses: ./.github/workflows/eks-deploy.yml
+    secrets: inherit
+  deploy_helm:
+    if: inputs.deployHELM == true
+    uses: ./.github/workflows/eks-helm-deploy.yml
     secrets: inherit
