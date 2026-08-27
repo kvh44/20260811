@@ -6,12 +6,6 @@ on:
       - main
     paths-ignore:
       - helm/20260819/values.yaml
-  workflow_call:
-    inputs:
-      deploy:
-        description: "Deploy Helm?"
-        required: true
-        type: boolean
 
 permissions:
   id-token: write
@@ -23,7 +17,6 @@ concurrency:
 
 jobs:
   deploy:
-    if: inputs.deploy == true
     runs-on: ubuntu-latest
 
     steps:
