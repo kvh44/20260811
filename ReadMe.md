@@ -160,9 +160,13 @@ Notes
 
 Use Mysql in docker
 -------------------------
-Start mysql in docker:
-docker compose up -d
+Start app and mysql in docker:
+docker compose -f compose.app.yml -f compose.mysql.yml up --build
 docker compose ps
+
+Or start seperately:
+docker compose -f compose.mysql.yml up --build
+
 
 Log:
 docker compose logs -f mysql

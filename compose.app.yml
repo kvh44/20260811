@@ -1,0 +1,20 @@
+services:
+  app:
+    build:
+      context: .
+    image: "20260811"
+    container_name: 20260811-container
+    restart: unless-stopped
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      LOCAL_DB_URL: jdbc:mysql://mysql:3306/appdb
+      LOCAL_DB_USERNAME: appuser
+      LOCAL_DB_PASSWORD: apppassword
+
+    ports:
+      - "8001:8001"
