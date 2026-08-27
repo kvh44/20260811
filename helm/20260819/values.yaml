@@ -4,7 +4,7 @@ fullnameOverride: "20260819"
 
 image:
   repository: 878915883825.dkr.ecr.ca-central-1.amazonaws.com/test
-  tag: "8cdb5cca6c61ea3359b64d8d7a303fad8a265912"
+  tag: "e458be5133d7e26e87db2e4aa6135494f0000bf0"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
