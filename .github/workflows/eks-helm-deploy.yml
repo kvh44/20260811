@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: inputs.deploy == true
     runs-on: ubuntu-latest
 
     steps:

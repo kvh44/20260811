@@ -46,6 +46,7 @@ permissions:
 jobs:
   deploy:
     name: Deploy
+    if: inputs.deploy == true
     runs-on: ubuntu-latest
     environment: production
 

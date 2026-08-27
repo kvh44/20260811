@@ -1,0 +1,26 @@
+name: Input parameters for workflow dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment"
+        required: true
+        type: choice
+        options:
+          - local
+          - production
+      deploy:
+        description: "Deploy application?"
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  display_parameters:
+    if: inputs.deploy == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show environment
+        run: |
+          echo "Ready to deploy to ${{ inputs.environment }}"
