@@ -17,10 +17,9 @@ on:
         default: true
 
 jobs:
-  display_parameters:
-    if: inputs.deploy == true
-    runs-on: ubuntu-latest
-    steps:
-      - name: Show environment
-        run: |
-          echo "Ready to deploy to ${{ inputs.environment }}"
+  deploy_ecs:
+    uses: ./.github/workflows/ecs-deploy.yml
+    with:
+      deploy: ${{ inputs.deploy }}
+      environment: ${{ inputs.environment }}
+    secrets: inherit
