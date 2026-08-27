@@ -20,7 +20,7 @@ env:
   - name: SERVER_PORT
     value: "8001"
   - name: SPRING_PROFILES_ACTIVE
-    value: ${{ vars.SPRING_PROFILES_ACTIVE }}
+    value: "local"
 resources:
   requests:
     cpu: 100m
