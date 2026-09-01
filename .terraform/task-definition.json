@@ -1,0 +1,43 @@
+{
+  "family": "app-20260901-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "app-20260901-ecs-task-execution",
+  "taskRoleArn": "app-20260811-ecs-task",
+  "containerDefinitions": [
+    {
+      "name": "20260901",
+      "image": "IMAGE_URI",
+      "essential": true,
+      "portMappings": [
+        {
+          "name": "http",
+          "containerPort": 8001,
+          "hostPort": 8001,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "local"
+        },
+        {
+          "name": "MANAGEMENT_HEALTH_DB_ENABLED",
+          "value": "false"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "20260901",
+          "awslogs-region": "ca-central-1",
+          "awslogs-stream-prefix": "app"
+        }
+      }
+    }
+  ]
+}
