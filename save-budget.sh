@@ -36,8 +36,8 @@ esac
 K8S_DEPLOYMENT="${K8S_DEPLOYMENT:-20260819}"
 K8S_NAMESPACE="${K8S_NAMESPACE:-default}"
 
-ECS_CLUSTER="${ECS_CLUSTER:-cluster20260811}"
-ECS_SERVICE="${ECS_SERVICE:-ecs-service-20260818}"
+ECS_CLUSTER="${ECS_CLUSTER:-app-20260901-cluster}"
+ECS_SERVICE="${ECS_SERVICE:-app-20260901-service}"
 AWS_REGION="${AWS_REGION:-ca-central-1}"
 
 echo "Setting Kubernetes deployment ${K8S_DEPLOYMENT} in namespace ${K8S_NAMESPACE} to ${K8S_REPLICAS} replica(s)..."

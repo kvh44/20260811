@@ -1,43 +1,88 @@
 {
-  "family": "app-20260901-task",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "512",
-  "memory": "1024",
-  "executionRoleArn": "app-20260901-ecs-task-execution",
-  "taskRoleArn": "app-20260811-ecs-task",
-  "containerDefinitions": [
-    {
-      "name": "20260901",
-      "image": "IMAGE_URI",
-      "essential": true,
-      "portMappings": [
+    "taskDefinitionArn": "arn:aws:ecs:ca-central-1:878915883825:task-definition/app-20260901-task:4",
+    "containerDefinitions": [
         {
-          "name": "http",
-          "containerPort": 8001,
-          "hostPort": 8001,
-          "protocol": "tcp",
-          "appProtocol": "http"
+            "name": "20260901",
+            "image": "878915883825.dkr.ecr.ca-central-1.amazonaws.com/20260901:14baa381adaeb74fc26cd7b57ce0c35591f67aba",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8001,
+                    "hostPort": 8001,
+                    "protocol": "tcp",
+                    "name": "http",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "MANAGEMENT_HEALTH_DB_ENABLED",
+                    "value": "false"
+                },
+                {
+                    "name": "SPRING_PROFILES_ACTIVE",
+                    "value": "local"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "20260901",
+                    "awslogs-region": "ca-central-1",
+                    "awslogs-stream-prefix": "app"
+                }
+            },
+            "systemControls": []
         }
-      ],
-      "environment": [
+    ],
+    "family": "app-20260901-task",
+    "taskRoleArn": "arn:aws:iam::878915883825:role/app-20260811-ecs-task",
+    "executionRoleArn": "arn:aws:iam::878915883825:role/app-20260901-ecs-task-execution",
+    "networkMode": "awsvpc",
+    "revision": 4,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
         {
-          "name": "SPRING_PROFILES_ACTIVE",
-          "value": "local"
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
         },
         {
-          "name": "MANAGEMENT_HEALTH_DB_ENABLED",
-          "value": "false"
+            "name": "ecs.capability.execution-role-awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+        },
+        {
+            "name": "ecs.capability.task-eni"
         }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "20260901",
-          "awslogs-region": "ca-central-1",
-          "awslogs-stream-prefix": "app"
-        }
-      }
-    }
-  ]
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EC2",
+        "MANAGED_INSTANCES",
+        "FARGATE"
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "512",
+    "memory": "1024",
+    "registeredAt": "2026-09-01T20:06:19.057Z",
+    "registeredBy": "arn:aws:iam::878915883825:root",
+    "tags": []
 }
