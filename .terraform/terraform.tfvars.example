@@ -1,0 +1,9 @@
+# Keep the defaults unless you also update task-definition.json. That file is
+# rendered directly by GitHub Actions, so its family, role names, log group,
+# region, container name, and port must remain aligned with these values.
+aws_region          = "ca-central-1"
+project_name        = "20260901"
+ecr_repository_name = "20260901"
+container_name      = "20260901"
+container_port      = 8001
+spring_profile      = "local"
