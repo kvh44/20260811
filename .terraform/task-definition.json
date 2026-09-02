@@ -39,6 +39,7 @@
         }
     ],
     "family": "app-20260901-task",
+    "taskRoleArn": "arn:aws:iam::878915883825:role/app-20260901-ecs-task",
     "executionRoleArn": "arn:aws:iam::878915883825:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
     "revision": 7,
