@@ -123,6 +123,22 @@ resource "aws_security_group" "task" {
     security_groups = [aws_security_group.alb.id]
   }
 
+  ingress {
+    description = "Spring Boot traffic from the Internet (IPv4)"
+    from_port   = var.container_port
+    to_port     = var.container_port
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description      = "Spring Boot traffic from the Internet (IPv6)"
+    from_port        = var.container_port
+    to_port          = var.container_port
+    protocol         = "tcp"
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -132,7 +148,7 @@ resource "aws_security_group" "task" {
 }
 
 resource "aws_cloudwatch_log_group" "app" {
-  name              = "${var.project_name}"
+  name              = var.project_name
   retention_in_days = var.log_retention_in_days
 }
 
