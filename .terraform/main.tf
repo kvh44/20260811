@@ -261,9 +261,17 @@ resource "aws_ecs_service" "app" {
 
   enable_execute_command = true
 
-  deployment_minimum_healthy_percent = 50
+  # Keep the current task serving traffic until its replacement passes the
+  # target group's health check. With a maximum of 200%, ECS can run both
+  # task revisions during the rolling deployment.
+  deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
   health_check_grace_period_seconds  = var.health_check_grace_period_seconds
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
 
   network_configuration {
     assign_public_ip = true
