@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - ../../helm/20260903/values.yaml
+      - helm/20260903/values.yaml
 
 permissions:
   id-token: write
@@ -67,11 +67,14 @@ jobs:
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Update Helm image tag for Argo CD
+      - name: Update Helm image reference for Argo CD
         env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.EKS_ECR_REPOSITORY }}
           IMAGE_TAG: ${{ github.sha }}
           VALUES_FILE: helm/20260903/values.yaml
         run: |
+          sed -i -E "s|^  repository:.*|  repository: \"${ECR_REGISTRY}/${ECR_REPOSITORY}\"|" "${VALUES_FILE}"
           sed -i -E "s|^  tag:.*|  tag: \"${IMAGE_TAG}\"|" "${VALUES_FILE}"
 
           if git diff --quiet -- "${VALUES_FILE}"; then
