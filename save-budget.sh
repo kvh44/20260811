@@ -33,7 +33,7 @@ esac
 
 # Scale EKS deployment and ECS service based on action.
 # Environment variables override the values in save-budget.env.
-K8S_DEPLOYMENT="${K8S_DEPLOYMENT:-20260819}"
+K8S_DEPLOYMENT="${K8S_DEPLOYMENT:-20260903}"
 K8S_NAMESPACE="${K8S_NAMESPACE:-default}"
 
 ECS_CLUSTER="${ECS_CLUSTER:-app-20260901-cluster}"

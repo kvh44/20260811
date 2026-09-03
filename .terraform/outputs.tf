@@ -35,3 +35,35 @@ output "github_actions_variables" {
     SPRING_PROFILES_ACTIVE = var.spring_profile
   }
 }
+
+output "eks_cluster_name" {
+  description = "Value for the EKS_CLUSTER_NAME GitHub Actions variable."
+  value       = aws_eks_cluster.this.name
+}
+
+output "eks_cluster_endpoint" {
+  description = "EKS Kubernetes API endpoint."
+  value       = aws_eks_cluster.this.endpoint
+}
+
+output "eks_ecr_repository_url" {
+  description = "ECR repository URL pushed by the EKS workflows."
+  value       = aws_ecr_repository.eks.repository_url
+}
+
+output "github_actions_eks_role_arn" {
+  description = "Value for the AWS_ROLE_TO_ASSUME GitHub Actions variable."
+  value       = aws_iam_role.github_actions_eks.arn
+}
+
+output "github_actions_eks_variables" {
+  description = "Repository variables required by .github/workflows/eks-deploy.yml and .github/workflows/eks-helm-deploy.yml."
+  value = {
+    AWS_REGION         = var.aws_region
+    AWS_ROLE_TO_ASSUME = aws_iam_role.github_actions_eks.arn
+    ECR_REPOSITORY     = aws_ecr_repository.eks.name
+    EKS_CLUSTER_NAME   = aws_eks_cluster.this.name
+    ARGOCD_NAMESPACE   = var.argocd_namespace
+    ARGOCD_APPLICATION = var.argocd_application_name
+  }
+}

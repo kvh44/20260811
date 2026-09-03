@@ -1,26 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: users-api
-  namespace: argocd
+  name: {{ .Values.application.name | quote }}
+  namespace: {{ .Values.application.argocdNamespace | quote }}
 spec:
   project: default
   source:
-    repoURL: https://github.com/kvh44/20260811.git
-    targetRevision: main
-    path: helm/20260903
+    repoURL: {{ printf "https://github.com/%s.git" .Values.application.repository | quote }}
+    targetRevision: {{ .Values.application.branch | quote }}
+    path: {{ .Values.application.path | quote }}
     helm:
       releaseName: users-api
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: {{ .Values.application.namespace | quote }}
   ignoreDifferences:
-    # save-budget.sh controls replicas at 08:00 and 20:00. Argo CD should
-    # continue reconciling every other Deployment field without undoing it.
     - group: apps
       kind: Deployment
-      name: "20260903"
-      namespace: default
+      name: {{ .Values.application.deploymentName | quote }}
+      namespace: {{ .Values.application.namespace | quote }}
       jsonPointers:
         - /spec/replicas
   syncPolicy:
@@ -38,4 +36,3 @@ spec:
         duration: 10s
         factor: 2
         maxDuration: 3m
-

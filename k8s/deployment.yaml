@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "20260819"
+  name: "20260903"
   labels:
-    app: "20260819"
+    app: "20260903"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "20260819"
+      app: "20260903"
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: "20260819"
+        app: "20260903"
     spec:
       restartPolicy: Always
       containers:
-      - name: "20260819"
+      - name: "20260903"
         # IMAGE_PLACEHOLDER is replaced in CI with the built image (see .github/workflows/eks-deploy.yml)
         image: IMAGE_PLACEHOLDER
         imagePullPolicy: IfNotPresent
