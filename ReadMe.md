@@ -46,8 +46,6 @@ The EKS workflow uses GitHub OIDC, so it does not require long-lived AWS access 
    aws_iam_openid_connect_provider.github_actions \
    arn:aws:iam::878915883825:oidc-provider/token.actions.githubusercontent.com
 
-
-
    terraform plan
 
    aws iam get-open-id-connect-provider \
