@@ -5,7 +5,7 @@
 #
 # 1. Create an ECR repository to store your images.
 #    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
-#    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
+#    Replace the value of the `ECS_ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
 #    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
 #
 # 2. Create an ECS task definition, an ECS cluster, and an ECS service.
@@ -32,7 +32,7 @@ on:
 
 env:
   AWS_REGION: ${{ vars.AWS_REGION }}             # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}      # set this to your Amazon ECR repository name
+  ECR_REPOSITORY: ${{ vars.ECS_ECR_REPOSITORY }}      # set this to your Amazon ECR repository name
   ECS_SERVICE: ${{ vars.ECS_SERVICE }}                  # set this to your Amazon ECS service name
   ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }} # set this to the path to your Amazon ECS task definition

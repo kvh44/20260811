@@ -61,7 +61,7 @@ output "github_actions_eks_variables" {
   value = {
     AWS_REGION         = var.aws_region
     AWS_ROLE_TO_ASSUME = aws_iam_role.github_actions_eks.arn
-    ECR_REPOSITORY     = aws_ecr_repository.eks.name
+    EKS_ECR_REPOSITORY = aws_ecr_repository.eks.name
     EKS_CLUSTER_NAME   = aws_eks_cluster.this.name
     ARGOCD_NAMESPACE   = var.argocd_namespace
     ARGOCD_APPLICATION = var.argocd_application_name

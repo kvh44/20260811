@@ -38,20 +38,32 @@ AWS EKS deployment
 ------------------
 The EKS workflow uses GitHub OIDC, so it does not require long-lived AWS access keys.
 
-1. Deploy the IAM role and EKS access entry:
-   aws cloudformation deploy \
-     --profile default \
-     --region ca-central-1 \
-     --stack-name github-actions-oidc-20260811 \
-     --template-file .aws/github-actions-oidc-role.yml \
-     --capabilities CAPABILITY_NAMED_IAM
-2. In GitHub, open Settings > Secrets and variables > Actions > Variables and set:
-   AWS_ROLE_TO_ASSUME=arn:aws:iam::878915883825:role/GitHubActionsEKSDeploy-20260811
+1. Provision the EKS, ECR, GitHub OIDC role, and EKS access entry with Terraform:
+   cd .terraform
+   terraform init
+
+   terraform import \
+   aws_iam_openid_connect_provider.github_actions \
+   arn:aws:iam::878915883825:oidc-provider/token.actions.githubusercontent.com
+
+
+
+   terraform plan
+
+   aws iam get-open-id-connect-provider \
+   --profile default \
+   --open-id-connect-provider-arn \
+   arn:aws:iam::878915883825:oidc-provider/token.actions.githubusercontent.com
+
+   terraform apply
+   terraform output github_actions_eks_variables
+2. In GitHub, open Settings > Secrets and variables > Actions > Variables and set the values from `github_actions_eks_variables`:
+   AWS_ROLE_TO_ASSUME=<terraform output>
    AWS_REGION=ca-central-1
-   ECR_REPOSITORY=test
+   EKS_ECR_REPOSITORY=20260903
    EKS_CLUSTER_NAME=eks-cluster-20260903
 
-The role trust policy accepts OIDC tokens only from the main branch of this repository. Its AWS permissions are limited to pushing images to the test ECR repository and describing the EKS cluster. Kubernetes access is limited to edit operations in the default namespace.
+The role trust policy accepts OIDC tokens only from the main branch of this repository. Its AWS permissions are limited to pushing images to the EKS ECR repository and describing the EKS cluster. Kubernetes access is limited to edit operations in the default namespace.
 
 Notes
 -----
@@ -109,23 +121,20 @@ The EKS workflow uses GitHub OIDC, so it does not require long-lived AWS access
 keys. CI builds and pushes the image, commits the new tag to the Helm values,
 and lets Argo CD perform the deployment. CI no longer runs `kubectl apply`.
 
-1. Deploy the IAM role and EKS access entry:
-   aws cloudformation deploy \
-   --profile default \
-   --region ca-central-1 \
-   --stack-name github-actions-oidc-20260811 \
-   --template-file .aws/github-actions-oidc-role.yml \
-   --capabilities CAPABILITY_NAMED_IAM
-2. In GitHub, open Settings > Secrets and variables > Actions > Variables and set:
-   AWS_ROLE_TO_ASSUME=arn:aws:iam::878915883825:role/GitHubActionsEKSDeploy-20260811
+1. Provision the EKS, ECR, GitHub OIDC role, and EKS access entry with Terraform:
+   cd .terraform
+   terraform init
+   terraform plan
+   terraform apply
+   terraform output github_actions_eks_variables
+2. In GitHub, open Settings > Secrets and variables > Actions > Variables and set the values from `github_actions_eks_variables`:
+   AWS_ROLE_TO_ASSUME=<terraform output>
    AWS_REGION=ca-central-1
-   ECR_REPOSITORY=test
+   EKS_ECR_REPOSITORY=20260903
    EKS_CLUSTER_NAME=eks-cluster-20260903
 
-3. Install Helm locally, then bootstrap Argo CD after this branch is merged to
-   `main`:
-   brew install helm
-   ./bootstrap-argocd.sh
+3. Terraform installs and configures Argo CD; do not run `./bootstrap-argocd.sh`
+   afterward because it would manage the same Argo CD Application.
 
 4. Check synchronization:
    kubectl get applications -n argocd
@@ -133,7 +142,7 @@ and lets Argo CD perform the deployment. CI no longer runs `kubectl apply`.
    kubectl get deployment,service -n default
 
 Access the Argo CD UI locally:
-kubectl port-forward service/argargocdocd-server -n argocd 8080:443
+kubectl port-forward service/argocd-server -n argocd 8080:443
 
 Then open https://localhost:8080. Retrieve the initial admin password with:
 kubectl get secret argocd-initial-admin-secret -n argocd \
