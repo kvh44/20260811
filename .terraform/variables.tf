@@ -128,6 +128,23 @@ variable "github_repository" {
   description = "GitHub owner/repository allowed to assume the EKS deployment role."
   type        = string
   default     = "kvh44/20260811"
+
+  validation {
+    condition     = can(regex("^[^/]+/[^/]+$", var.github_repository))
+    error_message = "github_repository must use the owner/repository format."
+  }
+}
+
+variable "github_repository_owner_id" {
+  description = "Immutable GitHub owner ID included in this repository's OIDC subject claim."
+  type        = string
+  default     = "16013107"
+}
+
+variable "github_repository_id" {
+  description = "Immutable GitHub repository ID included in this repository's OIDC subject claim."
+  type        = string
+  default     = "1331272653"
 }
 
 variable "github_branch" {
@@ -139,7 +156,7 @@ variable "github_branch" {
 variable "github_actions_eks_role_name" {
   description = "IAM role name published as AWS_ROLE_TO_ASSUME for GitHub Actions."
   type        = string
-  default     = "GitHubActionsEKSDeploy-20260811"
+  default     = "GitHubActionsEKSDeploy-20260903"
 }
 
 variable "argocd_namespace" {

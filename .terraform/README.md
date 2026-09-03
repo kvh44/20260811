@@ -30,7 +30,9 @@ The EKS Terraform files create the infrastructure consumed by
   provider for future IAM roles for service accounts;
 - the `test` ECR repository used by the EKS workflows;
 - a GitHub OIDC provider and a branch-restricted deployment role with ECR
-  push, EKS discovery, and Kubernetes edit access limited to `default`;
+  push, EKS discovery, and Kubernetes edit access limited to `default`. The
+  role matches GitHub's immutable OIDC subject format, including this
+  repository's owner and repository IDs;
 - the Argo CD Helm release and an Argo CD Application that continuously
   reconciles `../helm/20260903` from the `main` branch.
 
@@ -47,7 +49,8 @@ terraform output github_actions_eks_variables
 
 Set the resulting values in GitHub **Settings → Secrets and variables →
 Actions → Variables**. In particular, `AWS_ROLE_TO_ASSUME`, `AWS_REGION`,
-`ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS workflows.
+`EKS_ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS
+workflows. `ECR_REPOSITORY` remains reserved for the ECS workflow.
 Do not run `../bootstrap-argocd.sh` after Terraform has created Argo CD: this
 Terraform configuration already owns the same Argo CD Application.
 
