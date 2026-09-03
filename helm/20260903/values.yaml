@@ -3,8 +3,8 @@ replicaCount: 1
 fullnameOverride: "20260903"
 
 image:
-  repository: "878915883825.dkr.ecr.ca-central-1.amazonaws.com/20260903"
-  tag: "7e3b24d952f90c3035ec093e5fcd923fd4ebb67b"
+  repository: 878915883825.dkr.ecr.ca-central-1.amazonaws.com/20260903
+  tag: "a02f857353148cd2aafca9e4a46395b1dbc04c5c"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
