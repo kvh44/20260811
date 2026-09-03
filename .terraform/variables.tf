@@ -68,3 +68,112 @@ variable "health_check_grace_period_seconds" {
   type        = number
   default     = 300
 }
+
+variable "eks_cluster_name" {
+  description = "Name of the EKS cluster used by the EKS GitHub Actions workflows."
+  type        = string
+  default     = "eks-cluster-20260903"
+}
+
+variable "eks_kubernetes_version" {
+  description = "Optional EKS Kubernetes version. Set null to let EKS select its default supported version."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "eks_vpc_cidr" {
+  description = "CIDR block for the EKS VPC. It must not overlap with vpc_cidr."
+  type        = string
+  default     = "10.40.0.0/16"
+}
+
+variable "eks_public_access_cidrs" {
+  description = "CIDRs allowed to reach the public EKS API endpoint. GitHub-hosted runners require 0.0.0.0/0 unless you use a self-hosted runner."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "eks_node_instance_types" {
+  description = "EC2 instance types for the EKS managed node group."
+  type        = list(string)
+  default     = ["t3.medium"]
+}
+
+variable "eks_node_min_size" {
+  description = "Minimum number of EKS managed nodes."
+  type        = number
+  default     = 1
+}
+
+variable "eks_node_desired_size" {
+  description = "Initial number of EKS managed nodes."
+  type        = number
+  default     = 2
+}
+
+variable "eks_node_max_size" {
+  description = "Maximum number of EKS managed nodes."
+  type        = number
+  default     = 3
+}
+
+variable "eks_ecr_repository_name" {
+  description = "ECR repository pushed by the EKS workflows and referenced by the Helm chart."
+  type        = string
+  default     = "20260903"
+}
+
+variable "github_repository" {
+  description = "GitHub owner/repository allowed to assume the EKS deployment role."
+  type        = string
+  default     = "kvh44/20260811"
+}
+
+variable "github_branch" {
+  description = "Git branch allowed to assume the EKS deployment role."
+  type        = string
+  default     = "main"
+}
+
+variable "github_actions_eks_role_name" {
+  description = "IAM role name published as AWS_ROLE_TO_ASSUME for GitHub Actions."
+  type        = string
+  default     = "GitHubActionsEKSDeploy-20260811"
+}
+
+variable "argocd_namespace" {
+  description = "Kubernetes namespace in which Argo CD is installed."
+  type        = string
+  default     = "argocd"
+}
+
+variable "argocd_chart_version" {
+  description = "Version of the Argo CD Helm chart to install."
+  type        = string
+  default     = "10.2.1"
+}
+
+variable "argocd_application_name" {
+  description = "Name of the Argo CD Application that reconciles the users API Helm chart."
+  type        = string
+  default     = "users-api"
+}
+
+variable "argocd_application_path" {
+  description = "Repository-relative Helm chart path reconciled by Argo CD."
+  type        = string
+  default     = "helm/20260903"
+}
+
+variable "argocd_application_namespace" {
+  description = "Kubernetes namespace into which Argo CD deploys the users API."
+  type        = string
+  default     = "default"
+}
+
+variable "argocd_application_deployment_name" {
+  description = "Deployment name for which Argo CD ignores replica changes made by save-budget.sh."
+  type        = string
+  default     = "20260903"
+}

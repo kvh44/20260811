@@ -7,3 +7,9 @@ ecr_repository_name = "20260901"
 container_name      = "20260901"
 container_port      = 8001
 spring_profile      = "local"
+
+# EKS, Argo CD, Helm, and GitHub Actions defaults are defined in variables.tf.
+# Override them here only when your account already uses the same resource names.
+# eks_cluster_name        = "eks-cluster-20260903"
+# eks_ecr_repository_name = "20260903"
+# github_repository       = "kvh44/20260811"

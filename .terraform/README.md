@@ -18,6 +18,48 @@ GitHub workflow run replaces the `IMAGE_URI` placeholder in
 service to one task. This avoids Terraform trying to start a task before an
 image exists in ECR.
 
+## EKS, Helm, and Argo CD
+
+The EKS Terraform files create the infrastructure consumed by
+`../.github/workflows/eks-deploy.yml` and
+`../.github/workflows/eks-helm-deploy.yml`:
+
+- a dedicated VPC, private EKS node subnets, one NAT gateway, and EKS control
+  plane logging;
+- an EKS cluster, managed node group, standard EKS add-ons, and the EKS OIDC
+  provider for future IAM roles for service accounts;
+- the `test` ECR repository used by the EKS workflows;
+- a GitHub OIDC provider and a branch-restricted deployment role with ECR
+  push, EKS discovery, and Kubernetes edit access limited to `default`;
+- the Argo CD Helm release and an Argo CD Application that continuously
+  reconciles `../helm/20260903` from the `main` branch.
+
+Use credentials that can create VPC, IAM, EKS, ECR, CloudWatch, and Helm
+resources. The Helm provider invokes `aws eks get-token`, so the AWS CLI must
+also be installed and configured before applying this configuration.
+
+```bash
+cd .terraform
+terraform init
+terraform apply
+terraform output github_actions_eks_variables
+```
+
+Set the resulting values in GitHub **Settings → Secrets and variables →
+Actions → Variables**. In particular, `AWS_ROLE_TO_ASSUME`, `AWS_REGION`,
+`ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS workflows.
+Do not run `../bootstrap-argocd.sh` after Terraform has created Argo CD: this
+Terraform configuration already owns the same Argo CD Application.
+
+If this AWS account already contains `token.actions.githubusercontent.com`,
+the `test` repository, or an EKS cluster with the selected names, import the
+existing resource into the Terraform state before applying. Terraform must own
+the pre-existing cluster and its VPC resources to manage them safely.
+
+The EKS network intentionally uses one NAT gateway to reduce development cost;
+it is not highly available. EKS control plane, EC2 nodes, NAT gateway, and
+public IPv4 resources incur AWS charges until you destroy them.
+
 ## Deploy the infrastructure
 
 ```bash

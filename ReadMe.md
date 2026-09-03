@@ -49,7 +49,7 @@ The EKS workflow uses GitHub OIDC, so it does not require long-lived AWS access 
    AWS_ROLE_TO_ASSUME=arn:aws:iam::878915883825:role/GitHubActionsEKSDeploy-20260811
    AWS_REGION=ca-central-1
    ECR_REPOSITORY=test
-   EKS_CLUSTER_NAME=eks-cluster-20260819
+   EKS_CLUSTER_NAME=eks-cluster-20260903
 
 The role trust policy accepts OIDC tokens only from the main branch of this repository. Its AWS permissions are limited to pushing images to the test ECR repository and describing the EKS cluster. Kubernetes access is limited to edit operations in the default namespace.
 
@@ -69,39 +69,39 @@ aws configure list-profiles
 aws eks update-kubeconfig \
 --profile default \
 --region ca-central-1 \
---name eks-cluster-20260819
+--name eks-cluster-20260903
 
 # List pods
 kubectl get pods --all-namespaces
 
 # Inspect a pod
-kubectl describe pod -n default 20260819-7cd5fb6c48-hp6l6
+kubectl describe pod -n default 20260903-7cd5fb6c48-hp6l6
 
 # Read logs
-kubectl logs -n default 20260819-7cd5fb6c48-hp6l6 --all-containers
+kubectl logs -n default 20260903-7cd5fb6c48-hp6l6 --all-containers
 
 # Open a shell when the pod is Running
-kubectl exec -it -n default 20260819-7cd5fb6c48-hp6l6 -- /bin/sh
+kubectl exec -it -n default 20260903-7cd5fb6c48-hp6l6 -- /bin/sh
 
 # Read logs for a specific pod
-kubectl logs 20260819-bcbf7d5f7-87trf
+kubectl logs 20260903-bcbf7d5f7-87trf
 
 # Access the application locally
-kubectl port-forward -n default pod/20260819-7cd5fb6c48-hp6l6 8001:8001
-kubectl port-forward -n default service/20260819-svc  8001:8001
+kubectl port-forward -n default pod/20260903-7cd5fb6c48-hp6l6 8001:8001
+kubectl port-forward -n default service/20260903-svc  8001:8001
 
 # Delete pods to force recreation (e.g., after changing the image):
-kubectl delete pods -n default -l app=20260819
+kubectl delete pods -n default -l app=20260903
 # Scale down to 0 replicas to stop the deployment:
-kubectl scale deployment/20260819 --replicas=0 -n default
+kubectl scale deployment/20260903 --replicas=0 -n default
 # Scale up to 2 replicas to start the deployment:
-kubectl scale deployment/20260819 --replicas=2 -n default
+kubectl scale deployment/20260903 --replicas=2 -n default
 
 
 
 AWS EKS deployment with Helm and Argo CD
 -----------------------------------------
-The Kubernetes Deployment and Service are packaged in `helm/20260819`. Argo CD
+The Kubernetes Deployment and Service are packaged in `helm/20260903`. Argo CD
 tracks that chart on the `main` branch and continuously reconciles it into the
 EKS `default` namespace.
 
@@ -120,7 +120,7 @@ and lets Argo CD perform the deployment. CI no longer runs `kubectl apply`.
    AWS_ROLE_TO_ASSUME=arn:aws:iam::878915883825:role/GitHubActionsEKSDeploy-20260811
    AWS_REGION=ca-central-1
    ECR_REPOSITORY=test
-   EKS_CLUSTER_NAME=eks-cluster-20260819
+   EKS_CLUSTER_NAME=eks-cluster-20260903
 
 3. Install Helm locally, then bootstrap Argo CD after this branch is merged to
    `main`:
@@ -140,14 +140,14 @@ kubectl get secret argocd-initial-admin-secret -n argocd \
 -o jsonpath='{.data.password}' | base64 --decode; echo
 
 Validate the application chart before committing changes:
-helm lint helm/20260819
-helm template users-api helm/20260819
+helm lint helm/20260903
+helm template users-api helm/20260903
 
 The role trust policy accepts OIDC tokens only from the main branch of this
 repository. Argo CD owns the live application resources; changes to the chart
 or its values are the desired state.
 
-The Argo CD Application ignores only `/spec/replicas` on deployment `20260819`.
+The Argo CD Application ignores only `/spec/replicas` on deployment `20260903`.
 This allows `save-budget.sh` to scale the application to zero overnight without
 Argo CD immediately restoring it. Argo CD's own pods remain online and continue
 to consume a small amount of EKS worker capacity.

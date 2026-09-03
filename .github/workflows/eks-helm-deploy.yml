@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths-ignore:
-      - helm/20260819/values.yaml
+      - ../../helm/20260903/values.yaml
 
 permissions:
   id-token: write
@@ -70,7 +70,7 @@ jobs:
       - name: Update Helm image tag for Argo CD
         env:
           IMAGE_TAG: ${{ github.sha }}
-          VALUES_FILE: helm/20260819/values.yaml
+          VALUES_FILE: helm/20260903/values.yaml
         run: |
           sed -i -E "s|^  tag:.*|  tag: \"${IMAGE_TAG}\"|" "${VALUES_FILE}"
 

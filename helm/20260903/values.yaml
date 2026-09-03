@@ -1,6 +1,6 @@
 replicaCount: 1
 
-fullnameOverride: "20260819"
+fullnameOverride: "20260903"
 
 image:
   repository: 878915883825.dkr.ecr.ca-central-1.amazonaws.com/test
