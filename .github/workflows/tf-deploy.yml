@@ -59,7 +59,8 @@ jobs:
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
-            -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin
+            -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin \
+            -out=tfplan
 
       - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
