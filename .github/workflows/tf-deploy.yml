@@ -12,11 +12,6 @@ on:
           - init
           - plan
           - apply
-      confirm_deployment:
-        description: Confirm that you want to apply Terraform changes to AWS.
-        required: true
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -29,7 +24,7 @@ concurrency:
 jobs:
   terraform:
     name: Terraform ${{ inputs.operation }}
-    if: ${{ inputs.operation != 'apply' || inputs.confirm_deployment }}
+    if: ${{ inputs.operation != 'apply' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -64,7 +59,8 @@ jobs:
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
-            -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin
+            -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin \
+            -auto-approve \
 
       - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
@@ -75,7 +71,8 @@ jobs:
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
             -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin \
-            -out=tfplan-foundation
+            -out=tfplan-foundation \
+            -auto-approve \
           terraform apply -input=false -auto-approve tfplan-foundation
 
       - name: Configure kubeconfig for Helm
