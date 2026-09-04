@@ -171,6 +171,12 @@ variable "argocd_namespace" {
   default     = "argocd"
 }
 
+variable "enable_argocd" {
+  description = "Whether to install Argo CD with Helm after the EKS cluster is available."
+  type        = bool
+  default     = false
+}
+
 variable "argocd_chart_version" {
   description = "Version of the Argo CD Helm chart to install."
   type        = string

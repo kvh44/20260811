@@ -136,6 +136,24 @@ resource "aws_iam_role_policy_attachment" "github_actions_terraform_administrato
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
+resource "aws_eks_access_entry" "github_actions_terraform" {
+  cluster_name  = aws_eks_cluster.this.name
+  principal_arn = aws_iam_role.github_actions_terraform.arn
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "github_actions_terraform_cluster_admin" {
+  cluster_name  = aws_eks_cluster.this.name
+  principal_arn = aws_iam_role.github_actions_terraform.arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.github_actions_terraform]
+}
+
 data "aws_iam_policy_document" "github_actions_eks" {
   statement {
     sid       = "EcrAuthorization"

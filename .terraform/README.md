@@ -47,6 +47,12 @@ terraform apply
 terraform output github_actions_eks_variables
 ```
 
+Terraform creates EKS before it installs Argo CD. The `tf-deploy.yml` workflow
+performs these two phases automatically; the initial `plan` intentionally
+shows only the EKS foundation. Before installing Argo CD outside GitHub
+Actions, run `aws eks update-kubeconfig` for the EKS cluster so the Helm
+provider can use `~/.kube/config`.
+
 Set the resulting values in GitHub **Settings → Secrets and variables →
 Actions → Variables**. In particular, `AWS_ROLE_TO_ASSUME`, `AWS_REGION`,
 `EKS_ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS

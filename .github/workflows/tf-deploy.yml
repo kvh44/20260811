@@ -58,10 +58,23 @@ jobs:
 
       - name: Terraform plan
         if: ${{ inputs.operation == 'plan' }}
-        run: terraform plan -input=false -lock-timeout=5m
+        run: terraform plan -input=false -lock-timeout=5m -var="enable_argocd=false"
 
-      - name: Terraform apply
+      - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
         run: |
-          terraform plan -input=false -lock-timeout=5m -out=tfplan
-          terraform apply -input=false -auto-approve tfplan
+          terraform plan -input=false -lock-timeout=5m -var="enable_argocd=false" -out=tfplan-foundation
+          terraform apply -input=false -auto-approve tfplan-foundation
+
+      - name: Configure kubeconfig for Helm
+        if: ${{ inputs.operation == 'apply' }}
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ vars.EKS_CLUSTER_NAME }}" \
+            --region "${{ vars.AWS_REGION }}"
+
+      - name: Terraform install Argo CD
+        if: ${{ inputs.operation == 'apply' }}
+        run: |
+          terraform plan -input=false -lock-timeout=5m -var="enable_argocd=true" -out=tfplan-argocd
+          terraform apply -input=false -auto-approve tfplan-argocd
