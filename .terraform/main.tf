@@ -83,7 +83,9 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = length(aws_subnet.public)
+  # The subnet resource values are unknown during planning. Its instance
+  # count is the same deterministic availability-zone count used above.
+  count = length(local.availability_zones)
 
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id

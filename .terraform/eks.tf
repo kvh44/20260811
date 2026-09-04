@@ -63,7 +63,9 @@ resource "aws_route_table" "eks_public" {
 }
 
 resource "aws_route_table_association" "eks_public" {
-  count = length(aws_subnet.eks_public)
+  # The subnet resource values are unknown during planning. Its instance
+  # count is the same deterministic availability-zone count used above.
+  count = length(local.availability_zones)
 
   subnet_id      = aws_subnet.eks_public[count.index].id
   route_table_id = aws_route_table.eks_public.id
@@ -106,7 +108,8 @@ resource "aws_route_table" "eks_private" {
 }
 
 resource "aws_route_table_association" "eks_private" {
-  count = length(aws_subnet.eks_private)
+  # Keep the count plan-time known; see aws_subnet.eks_private above.
+  count = length(local.availability_zones)
 
   subnet_id      = aws_subnet.eks_private[count.index].id
   route_table_id = aws_route_table.eks_private.id
