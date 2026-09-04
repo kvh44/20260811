@@ -337,6 +337,12 @@ data "aws_iam_policy_document" "github_actions_ecs_deploy" {
   }
 
   statement {
+    sid       = "DescribeAvailabilityZones"
+    actions   = ["ec2:DescribeAvailabilityZones"]
+    resources = ["*"]
+  }
+
+  statement {
     sid       = "PassTaskRoles"
     actions   = ["iam:PassRole"]
     resources = [aws_iam_role.task.arn, aws_iam_role.task_execution.arn]
