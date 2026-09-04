@@ -45,7 +45,8 @@ fi
 
 terraform apply \
   -target=aws_iam_role.github_actions_terraform \
-  -target=aws_iam_role_policy_attachment.github_actions_terraform_administrator
+  -target=aws_iam_role_policy_attachment.github_actions_terraform_administrator \
+  -auto-approve
 
 echo
 echo "Set this GitHub Actions repository variable:"
