@@ -50,12 +50,23 @@ jobs:
       - name: Terraform init
         run: terraform init -input=false
 
-      - name: Import existing GitHub Actions IAM resources
+      - name: Import existing Terraform-managed AWS resources
         shell: bash
         run: |
           oidc_provider_address="aws_iam_openid_connect_provider.github_actions"
-          terraform_role_address="aws_iam_role.github_actions_terraform"
-          terraform_role_name="GitHubActionsTerraform-20260903"
+          eks_log_group_address="aws_cloudwatch_log_group.eks_cluster"
+          eks_log_group_name="/aws/eks/eks-cluster-20260903/cluster"
+
+          import_iam_role() {
+            local address="$1"
+            local name="$2"
+
+            if ! terraform state list | grep -Fxq "${address}"; then
+              if aws iam get-role --role-name "${name}" >/dev/null 2>&1; then
+                terraform import -input=false "${address}" "${name}"
+              fi
+            fi
+          }
 
           if ! terraform state list | grep -Fxq "${oidc_provider_address}"; then
             oidc_provider_arn="$(aws iam list-open-id-connect-providers \
@@ -67,16 +78,25 @@ jobs:
             fi
           fi
 
-          if ! terraform state list | grep -Fxq "${terraform_role_address}"; then
-            if aws iam get-role --role-name "${terraform_role_name}" >/dev/null 2>&1; then
-              terraform import -input=false "${terraform_role_address}" "${terraform_role_name}"
+          import_iam_role "aws_iam_role.github_actions_terraform" "GitHubActionsTerraform-20260903"
+          import_iam_role "aws_iam_role.github_actions_eks" "GitHubActionsEKSDeploy-20260903"
+          import_iam_role "aws_iam_role.eks_cluster" "eks-20260901-cluster"
+          import_iam_role "aws_iam_role.eks_node" "eks-20260901-node"
+
+          if ! terraform state list | grep -Fxq "${eks_log_group_address}"; then
+            existing_log_group="$(aws logs describe-log-groups \
+              --log-group-name-prefix "${eks_log_group_name}" \
+              --query "logGroups[?logGroupName=='${eks_log_group_name}'].logGroupName | [0]" \
+              --output text)"
+
+            if [[ "${existing_log_group}" == "${eks_log_group_name}" ]]; then
+              terraform import -input=false "${eks_log_group_address}" "${eks_log_group_name}"
             fi
           fi
 
       - name: Terraform plan
         if: ${{ inputs.operation == 'plan' }}
         run: |
-          ../bootstrap-github-actions-terraform-role.sh
           terraform plan -input=false -lock-timeout=5m \
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
@@ -86,7 +106,6 @@ jobs:
       - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
         run: |
-          ../bootstrap-github-actions-terraform-role.sh
           terraform plan -input=false -lock-timeout=5m \
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
