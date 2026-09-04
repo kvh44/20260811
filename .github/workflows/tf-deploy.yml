@@ -1,0 +1,67 @@
+name: Terraform infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Terraform operation to run.
+        required: true
+        default: plan
+        type: choice
+        options:
+          - init
+          - plan
+          - apply
+      confirm_deployment:
+        description: Confirm that you want to apply Terraform changes to AWS.
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-infrastructure
+  cancel-in-progress: false
+
+jobs:
+  terraform:
+    name: Terraform ${{ inputs.operation }}
+    if: ${{ inputs.operation != 'apply' || inputs.confirm_deployment }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .terraform
+    env:
+      TF_IN_AUTOMATION: "true"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: GitHubActionsTerraform
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform plan
+        if: ${{ inputs.operation == 'plan' }}
+        run: terraform plan -input=false -lock-timeout=5m
+
+      - name: Terraform apply
+        if: ${{ inputs.operation == 'apply' }}
+        run: |
+          terraform plan -input=false -lock-timeout=5m -out=tfplan
+          terraform apply -input=false -auto-approve tfplan
