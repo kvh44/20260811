@@ -159,6 +159,12 @@ variable "github_actions_eks_role_name" {
   default     = "GitHubActionsEKSDeploy-20260903"
 }
 
+variable "github_actions_terraform_role_name" {
+  description = "IAM role name used by GitHub Actions to provision Terraform-managed infrastructure."
+  type        = string
+  default     = "GitHubActionsTerraform-20260903"
+}
+
 variable "argocd_namespace" {
   description = "Kubernetes namespace in which Argo CD is installed."
   type        = string

@@ -56,6 +56,11 @@ output "github_actions_eks_role_arn" {
   value       = aws_iam_role.github_actions_eks.arn
 }
 
+output "github_actions_terraform_role_arn" {
+  description = "Value for the TERRAFORM_AWS_ROLE_TO_ASSUME GitHub Actions variable."
+  value       = aws_iam_role.github_actions_terraform.arn
+}
+
 output "github_actions_eks_variables" {
   description = "Repository variables required by .github/workflows/eks-deploy.yml and .github/workflows/eks-helm-deploy.yml."
   value = {
@@ -65,5 +70,13 @@ output "github_actions_eks_variables" {
     EKS_CLUSTER_NAME   = aws_eks_cluster.this.name
     ARGOCD_NAMESPACE   = var.argocd_namespace
     ARGOCD_APPLICATION = var.argocd_application_name
+  }
+}
+
+output "github_actions_terraform_variables" {
+  description = "Repository variables required by .github/workflows/tf-deploy.yml."
+  value = {
+    AWS_REGION                   = var.aws_region
+    TERRAFORM_AWS_ROLE_TO_ASSUME = aws_iam_role.github_actions_terraform.arn
   }
 }
