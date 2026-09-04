@@ -7,8 +7,6 @@ provider "helm" {
 }
 
 resource "helm_release" "argocd" {
-  count = var.enable_argocd ? 1 : 0
-
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
@@ -34,8 +32,6 @@ resource "helm_release" "argocd" {
 # Helm installs this resource only after the Argo CD chart has registered its
 # Application CRD, avoiding the two-pass bootstrap required by kubernetes_manifest.
 resource "helm_release" "argocd_application" {
-  count = var.enable_argocd ? 1 : 0
-
   name      = "argocd-application"
   chart     = "${path.module}/charts/argocd-application"
   namespace = var.argocd_namespace
