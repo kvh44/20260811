@@ -54,7 +54,6 @@ jobs:
       - name: Terraform plan
         if: ${{ inputs.operation == 'plan' }}
         run: |
-          ../bootstrap-github-actions-terraform-role.sh
           terraform plan -input=false -lock-timeout=5m \
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
@@ -65,7 +64,6 @@ jobs:
       - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
         run: |
-          ../bootstrap-github-actions-terraform-role.sh
           terraform plan -input=false -lock-timeout=5m \
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
