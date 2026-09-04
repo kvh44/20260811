@@ -59,8 +59,7 @@ jobs:
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
-            -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin \
-            -auto-approve \
+            -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin
 
       - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
@@ -71,8 +70,7 @@ jobs:
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
             -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin \
-            -out=tfplan-foundation \
-            -auto-approve \
+            -out=tfplan-foundation
           terraform apply -input=false -auto-approve tfplan-foundation
 
       - name: Configure kubeconfig for Helm
