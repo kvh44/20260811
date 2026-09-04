@@ -51,6 +51,29 @@ jobs:
       - name: Terraform init
         run: terraform init -input=false
 
+      - name: Import existing GitHub Actions IAM resources
+        shell: bash
+        run: |
+          oidc_provider_address="aws_iam_openid_connect_provider.github_actions"
+          terraform_role_address="aws_iam_role.github_actions_terraform"
+          terraform_role_name="GitHubActionsTerraform-20260903"
+
+          if ! terraform state list | grep -Fxq "${oidc_provider_address}"; then
+            oidc_provider_arn="$(aws iam list-open-id-connect-providers \
+              --query "OpenIDConnectProviderList[?contains(Arn, 'token.actions.githubusercontent.com')].Arn | [0]" \
+              --output text)"
+
+            if [[ -n "${oidc_provider_arn}" && "${oidc_provider_arn}" != "None" ]]; then
+              terraform import -input=false "${oidc_provider_address}" "${oidc_provider_arn}"
+            fi
+          fi
+
+          if ! terraform state list | grep -Fxq "${terraform_role_address}"; then
+            if aws iam get-role --role-name "${terraform_role_name}" >/dev/null 2>&1; then
+              terraform import -input=false "${terraform_role_address}" "${terraform_role_name}"
+            fi
+          fi
+
       - name: Terraform plan
         if: ${{ inputs.operation == 'plan' }}
         run: |
