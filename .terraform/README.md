@@ -64,6 +64,19 @@ configuration. Set `TERRAFORM_AWS_ROLE_TO_ASSUME` from
 `terraform output github_actions_terraform_variables` before running
 `tf-deploy.yml`. The role must be bootstrapped once by an AWS administrator;
 the limited EKS deployment role cannot create its own provisioning role.
+
+From the project root, use the included bootstrap script. It initializes
+Terraform, imports the account's pre-existing GitHub OIDC provider when needed,
+and creates only the Terraform provisioning role and its policy attachment:
+
+```bash
+AWS_PROFILE=default ./bootstrap-github-actions-terraform-role.sh
+```
+
+The script prints the value for the `TERRAFORM_AWS_ROLE_TO_ASSUME` GitHub
+repository variable. The targeted-apply warning is expected during this one-time
+bootstrap step.
+
 Do not run `../bootstrap-argocd.sh` after Terraform has created Argo CD: this
 Terraform configuration already owns the same Argo CD Application.
 
