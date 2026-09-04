@@ -123,6 +123,19 @@ resource "aws_iam_role" "github_actions_eks" {
   assume_role_policy = data.aws_iam_policy_document.github_actions_eks_assume_role.json
 }
 
+# Terraform manages VPC, IAM, EKS, ECR, ECS, and CloudWatch resources in this
+# account. Keep this provisioning role separate from the least-privilege EKS
+# image deployment role above.
+resource "aws_iam_role" "github_actions_terraform" {
+  name               = var.github_actions_terraform_role_name
+  assume_role_policy = data.aws_iam_policy_document.github_actions_eks_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_terraform_administrator" {
+  role       = aws_iam_role.github_actions_terraform.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+}
+
 data "aws_iam_policy_document" "github_actions_eks" {
   statement {
     sid       = "EcrAuthorization"

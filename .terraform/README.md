@@ -51,6 +51,13 @@ Set the resulting values in GitHub **Settings → Secrets and variables →
 Actions → Variables**. In particular, `AWS_ROLE_TO_ASSUME`, `AWS_REGION`,
 `EKS_ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS
 workflows. `ECR_REPOSITORY` remains reserved for the ECS workflow.
+
+The same configuration creates `GitHubActionsTerraform-20260903`, a separate
+GitHub OIDC role with the permissions required to provision this Terraform
+configuration. Set `TERRAFORM_AWS_ROLE_TO_ASSUME` from
+`terraform output github_actions_terraform_variables` before running
+`tf-deploy.yml`. The role must be bootstrapped once by an AWS administrator;
+the limited EKS deployment role cannot create its own provisioning role.
 Do not run `../bootstrap-argocd.sh` after Terraform has created Argo CD: this
 Terraform configuration already owns the same Argo CD Application.
 
