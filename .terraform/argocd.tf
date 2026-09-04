@@ -1,28 +1,14 @@
-data "aws_eks_cluster" "this" {
-  name = aws_eks_cluster.this.name
-}
-
 provider "helm" {
   kubernetes {
-    host                   = data.aws_eks_cluster.this.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      args = [
-        "eks",
-        "get-token",
-        "--cluster-name",
-        aws_eks_cluster.this.name,
-        "--region",
-        var.aws_region,
-      ]
-    }
+    # tf-deploy.yml writes this kubeconfig after the EKS foundation and the
+    # Terraform role's cluster access entry have been created.
+    config_path = pathexpand("~/.kube/config")
   }
 }
 
 resource "helm_release" "argocd" {
+  count = var.enable_argocd ? 1 : 0
+
   name             = "argocd"
   repository       = "https://argoproj.github.io/argo-helm"
   chart            = "argo-cd"
@@ -41,12 +27,15 @@ resource "helm_release" "argocd" {
     aws_eks_addon.coredns,
     aws_eks_addon.kube_proxy,
     aws_eks_addon.vpc_cni,
+    aws_eks_access_policy_association.github_actions_terraform_cluster_admin,
   ]
 }
 
 # Helm installs this resource only after the Argo CD chart has registered its
 # Application CRD, avoiding the two-pass bootstrap required by kubernetes_manifest.
 resource "helm_release" "argocd_application" {
+  count = var.enable_argocd ? 1 : 0
+
   name      = "argocd-application"
   chart     = "${path.module}/charts/argocd-application"
   namespace = var.argocd_namespace
