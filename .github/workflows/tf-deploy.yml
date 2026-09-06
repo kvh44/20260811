@@ -69,6 +69,15 @@ jobs:
             fi
           }
 
+          import_resource() {
+            local address="$1"
+            local id="$2"
+
+            if ! terraform state list | grep -Fxq "${address}"; then
+              terraform import -input=false "${address}" "${id}"
+            fi
+          }
+
           if ! terraform state list | grep -Fxq "${oidc_provider_address}"; then
             oidc_provider_arn="$(aws iam list-open-id-connect-providers \
               --query "OpenIDConnectProviderList[?contains(Arn, 'token.actions.githubusercontent.com')].Arn | [0]" \
@@ -83,6 +92,29 @@ jobs:
           import_iam_role "aws_iam_role.github_actions_eks" "GitHubActionsEKSDeploy-20260903"
           import_iam_role "aws_iam_role.eks_cluster" "eks-20260901-cluster"
           import_iam_role "aws_iam_role.eks_node" "eks-20260901-node"
+
+          eks_vpc_id="$(aws eks describe-cluster \
+            --cluster-name "${eks_cluster_name}" \
+            --query 'cluster.resourcesVpcConfig.vpcId' \
+            --output text 2>/dev/null || true)"
+
+          if [[ -n "${eks_vpc_id}" && "${eks_vpc_id}" != "None" ]]; then
+            import_resource "aws_vpc.eks" "${eks_vpc_id}"
+            import_resource "aws_eks_cluster.this" "${eks_cluster_name}"
+
+            read -r -a eks_private_subnet_ids <<< "$(aws ec2 describe-subnets \
+              --filters \
+                "Name=vpc-id,Values=${eks_vpc_id}" \
+                "Name=tag:kubernetes.io/role/internal-elb,Values=1" \
+              --query 'sort_by(Subnets, &AvailabilityZone)[].SubnetId' \
+              --output text)"
+
+            for index in "${!eks_private_subnet_ids[@]}"; do
+              import_resource \
+                "aws_subnet.eks_private[${index}]" \
+                "${eks_private_subnet_ids[${index}]}"
+            done
+          fi
 
           terraform_role_arn="$(aws iam get-role \
             --role-name "GitHubActionsTerraform-20260903" \
