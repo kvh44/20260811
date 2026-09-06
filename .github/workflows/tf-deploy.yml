@@ -134,6 +134,21 @@ jobs:
               "${eks_cluster_name}:${eks_node_group_name}"
           fi
 
+          import_eks_addon() {
+            local address="$1"
+            local addon_name="$2"
+
+            if aws eks describe-addon \
+              --cluster-name "${eks_cluster_name}" \
+              --addon-name "${addon_name}" >/dev/null 2>&1; then
+              import_resource "${address}" "${eks_cluster_name}:${addon_name}"
+            fi
+          }
+
+          import_eks_addon "aws_eks_addon.vpc_cni" "vpc-cni"
+          import_eks_addon "aws_eks_addon.coredns" "coredns"
+          import_eks_addon "aws_eks_addon.kube_proxy" "kube-proxy"
+
           eks_vpc_id="$(aws ec2 describe-vpcs \
             --filters \
               "Name=tag:Name,Values=eks-20260901-vpc" \
