@@ -53,6 +53,11 @@ then installs Argo CD. Before installing Argo CD outside GitHub Actions, run
 `aws eks update-kubeconfig` for the EKS cluster so the Helm provider can use
 `~/.kube/config`.
 
+`tf-deploy.yml` creates (if necessary) an account-specific S3 state bucket,
+enables versioning, encryption, and S3 lock files, then uses
+`terraform/20260811.tfstate` as its remote state. This state is required for
+GitHub-hosted runners to retain imported and created resources between runs.
+
 Set the resulting values in GitHub **Settings → Secrets and variables →
 Actions → Variables**. In particular, `AWS_ROLE_TO_ASSUME`, `AWS_REGION`,
 `EKS_ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS

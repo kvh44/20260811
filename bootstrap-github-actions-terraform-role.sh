@@ -26,7 +26,18 @@ if [[ -n "${AWS_PROFILE:-}" ]]; then
 fi
 
 cd "${TERRAFORM_DIR}"
-terraform init
+if [[ -n "${TERRAFORM_STATE_BUCKET:-}" ]]; then
+  terraform init -reconfigure \
+    -backend-config="bucket=${TERRAFORM_STATE_BUCKET}" \
+    -backend-config="key=${TERRAFORM_STATE_KEY:-terraform/20260811.tfstate}" \
+    -backend-config="region=${AWS_REGION:-ca-central-1}" \
+    -backend-config="encrypt=true" \
+    -backend-config="use_lockfile=true"
+else
+  # The workflow configures the remote backend. Local bootstrapping only needs
+  # a temporary state to create the initial OIDC role.
+  terraform init -backend=false
+fi
 
 # GitHub's OIDC provider is account-wide and may already have been created by
 # CloudFormation or an earlier Terraform run. Import it into this state before
