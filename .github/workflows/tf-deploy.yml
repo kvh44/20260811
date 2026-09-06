@@ -125,6 +125,15 @@ jobs:
           import_iam_role "aws_iam_role.eks_cluster" "eks-20260901-cluster"
           import_iam_role "aws_iam_role.eks_node" "eks-20260901-node"
 
+          eks_node_group_name="eks-20260901-default"
+          if aws eks describe-nodegroup \
+            --cluster-name "${eks_cluster_name}" \
+            --nodegroup-name "${eks_node_group_name}" >/dev/null 2>&1; then
+            import_resource \
+              "aws_eks_node_group.default" \
+              "${eks_cluster_name}:${eks_node_group_name}"
+          fi
+
           eks_vpc_id="$(aws ec2 describe-vpcs \
             --filters \
               "Name=tag:Name,Values=eks-20260901-vpc" \
