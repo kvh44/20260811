@@ -140,6 +140,34 @@ jobs:
             -target=aws_eks_addon.kube_proxy \
             -target=aws_eks_access_policy_association.github_actions_terraform_cluster_admin \
             -out=tfplan
+
+      - name: Remove failed EKS node group
+        if: ${{ inputs.operation == 'apply' }}
+        shell: bash
+        run: |
+          eks_cluster_name="eks-cluster-20260903"
+          node_group_name="eks-20260901-default"
+          node_group_status="$(aws eks describe-nodegroup \
+            --region "${{ vars.AWS_REGION }}" \
+            --cluster-name "${eks_cluster_name}" \
+            --nodegroup-name "${node_group_name}" \
+            --query 'nodegroup.status' \
+            --output text 2>/dev/null || true)"
+
+          if [[ "${node_group_status}" == "CREATE_FAILED" ]]; then
+            echo "Deleting failed node group ${node_group_name}..."
+            aws eks delete-nodegroup \
+              --region "${{ vars.AWS_REGION }}" \
+              --cluster-name "${eks_cluster_name}" \
+              --nodegroup-name "${node_group_name}"
+            aws eks wait nodegroup-deleted \
+              --region "${{ vars.AWS_REGION }}" \
+              --cluster-name "${eks_cluster_name}" \
+              --nodegroup-name "${node_group_name}"
+          else
+            echo "No failed node group to delete (status: ${node_group_status:-not found})."
+          fi
+
       - name: Terraform apply EKS foundation
         if: ${{ inputs.operation == 'apply' }}
         run: |
