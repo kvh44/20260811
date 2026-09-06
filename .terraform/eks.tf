@@ -167,6 +167,10 @@ resource "aws_eks_node_group" "default" {
 
   depends_on = [
     aws_iam_role_policy_attachment.eks_node,
+    # Nodes are launched in private subnets. They must have the NAT-backed
+    # default route before nodeadm can call AWS APIs and join the cluster.
+    aws_route_table_association.eks_public,
+    aws_route_table_association.eks_private,
   ]
 
   tags = local.common_tags
