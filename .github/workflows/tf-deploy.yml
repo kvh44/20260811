@@ -54,8 +54,9 @@ jobs:
         shell: bash
         run: |
           oidc_provider_address="aws_iam_openid_connect_provider.github_actions"
+          eks_cluster_name="eks-cluster-20260903"
           eks_log_group_address="aws_cloudwatch_log_group.eks_cluster"
-          eks_log_group_name="/aws/eks/eks-cluster-20260903/cluster"
+          eks_log_group_name="/aws/eks/${eks_cluster_name}/cluster"
 
           import_iam_role() {
             local address="$1"
@@ -83,6 +84,39 @@ jobs:
           import_iam_role "aws_iam_role.eks_cluster" "eks-20260901-cluster"
           import_iam_role "aws_iam_role.eks_node" "eks-20260901-node"
 
+          terraform_role_arn="$(aws iam get-role \
+            --role-name "GitHubActionsTerraform-20260903" \
+            --query 'Role.Arn' \
+            --output text)"
+          terraform_access_entry_address="aws_eks_access_entry.github_actions_terraform"
+          terraform_access_entry_id="${eks_cluster_name}:${terraform_role_arn}"
+          terraform_access_policy_address="aws_eks_access_policy_association.github_actions_terraform_cluster_admin"
+          terraform_access_policy_arn="arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+          if ! terraform state list | grep -Fxq "${terraform_access_entry_address}"; then
+            if aws eks describe-access-entry \
+              --cluster-name "${eks_cluster_name}" \
+              --principal-arn "${terraform_role_arn}" >/dev/null 2>&1; then
+              terraform import -input=false \
+                "${terraform_access_entry_address}" \
+                "${terraform_access_entry_id}"
+            fi
+          fi
+
+          if ! terraform state list | grep -Fxq "${terraform_access_policy_address}"; then
+            existing_access_policy="$(aws eks list-associated-access-policies \
+              --cluster-name "${eks_cluster_name}" \
+              --principal-arn "${terraform_role_arn}" \
+              --query "associatedAccessPolicies[?policyArn=='${terraform_access_policy_arn}'].policyArn | [0]" \
+              --output text)"
+
+            if [[ "${existing_access_policy}" == "${terraform_access_policy_arn}" ]]; then
+              terraform import -input=false \
+                "${terraform_access_policy_address}" \
+                "${eks_cluster_name}#${terraform_role_arn}#${terraform_access_policy_arn}"
+            fi
+          fi
+
           if ! terraform state list | grep -Fxq "${eks_log_group_address}"; then
             existing_log_group="$(aws logs describe-log-groups \
               --log-group-name-prefix "${eks_log_group_name}" \
@@ -98,6 +132,9 @@ jobs:
         if: ${{ inputs.operation == 'plan' }}
         run: |
           terraform plan -input=false -lock-timeout=5m \
+            -target=aws_route_table_association.eks_public \
+            -target=aws_route_table_association.eks_private \
+            -target=aws_eks_node_group.default \
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
@@ -107,6 +144,9 @@ jobs:
         if: ${{ inputs.operation == 'apply' }}
         run: |
           terraform plan -input=false -lock-timeout=5m \
+            -target=aws_route_table_association.eks_public \
+            -target=aws_route_table_association.eks_private \
+            -target=aws_eks_node_group.default \
             -target=aws_eks_addon.vpc_cni \
             -target=aws_eks_addon.coredns \
             -target=aws_eks_addon.kube_proxy \
