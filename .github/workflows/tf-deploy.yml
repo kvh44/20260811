@@ -211,25 +211,17 @@ jobs:
 
             if [[ -n "${eks_public_route_table_id}" && "${eks_public_route_table_id}" != "None" ]]; then
               for index in "${!eks_public_subnet_ids[@]}"; do
-                association_id="$(aws ec2 describe-route-tables \
-                  --route-table-ids "${eks_public_route_table_id}" \
-                  --query "RouteTables[0].Associations[?SubnetId=='${eks_public_subnet_ids[${index}]}'].RouteTableAssociationId | [0]" \
-                  --output text)"
-                if [[ -n "${association_id}" && "${association_id}" != "None" ]]; then
-                  import_resource "aws_route_table_association.eks_public[${index}]" "${association_id}"
-                fi
+                import_resource \
+                  "aws_route_table_association.eks_public[${index}]" \
+                  "${eks_public_subnet_ids[${index}]}/${eks_public_route_table_id}"
               done
             fi
 
             if [[ -n "${eks_private_route_table_id}" && "${eks_private_route_table_id}" != "None" ]]; then
               for index in "${!eks_private_subnet_ids[@]}"; do
-                association_id="$(aws ec2 describe-route-tables \
-                  --route-table-ids "${eks_private_route_table_id}" \
-                  --query "RouteTables[0].Associations[?SubnetId=='${eks_private_subnet_ids[${index}]}'].RouteTableAssociationId | [0]" \
-                  --output text)"
-                if [[ -n "${association_id}" && "${association_id}" != "None" ]]; then
-                  import_resource "aws_route_table_association.eks_private[${index}]" "${association_id}"
-                fi
+                import_resource \
+                  "aws_route_table_association.eks_private[${index}]" \
+                  "${eks_private_subnet_ids[${index}]}/${eks_private_route_table_id}"
               done
             fi
           fi
