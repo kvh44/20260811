@@ -47,8 +47,40 @@ jobs:
         with:
           terraform_wrapper: false
 
+      - name: Initialize Terraform state bucket
+        id: terraform_state
+        shell: bash
+        run: |
+          aws_account_id="$(aws sts get-caller-identity --query 'Account' --output text)"
+          state_bucket="20260811-${aws_account_id}-${{ vars.AWS_REGION }}-terraform-state"
+
+          if ! aws s3api head-bucket --bucket "${state_bucket}" 2>/dev/null; then
+            aws s3api create-bucket \
+              --bucket "${state_bucket}" \
+              --region "${{ vars.AWS_REGION }}" \
+              --create-bucket-configuration "LocationConstraint=${{ vars.AWS_REGION }}"
+          fi
+
+          aws s3api put-bucket-versioning \
+            --bucket "${state_bucket}" \
+            --versioning-configuration Status=Enabled
+          aws s3api put-bucket-encryption \
+            --bucket "${state_bucket}" \
+            --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+          aws s3api put-public-access-block \
+            --bucket "${state_bucket}" \
+            --public-access-block-configuration 'BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true'
+
+          echo "bucket=${state_bucket}" >> "${GITHUB_OUTPUT}"
+
       - name: Terraform init
-        run: terraform init -input=false
+        run: |
+          terraform init -input=false -reconfigure \
+            -backend-config="bucket=${{ steps.terraform_state.outputs.bucket }}" \
+            -backend-config="key=terraform/20260811.tfstate" \
+            -backend-config="region=${{ vars.AWS_REGION }}" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
 
       - name: Import existing Terraform-managed AWS resources
         shell: bash
@@ -101,9 +133,17 @@ jobs:
             --output text)"
 
           if [[ -n "${eks_vpc_id}" && "${eks_vpc_id}" != "None" ]]; then
-            echo "Importing existing EKS VPC ${eks_vpc_id} and its private subnets..."
+            echo "Importing existing EKS VPC ${eks_vpc_id} and its network resources..."
             import_resource "aws_vpc.eks" "${eks_vpc_id}"
             import_resource "aws_eks_cluster.this" "${eks_cluster_name}"
+
+            eks_internet_gateway_id="$(aws ec2 describe-internet-gateways \
+              --filters "Name=attachment.vpc-id,Values=${eks_vpc_id}" \
+              --query 'InternetGateways[0].InternetGatewayId' \
+              --output text)"
+            if [[ -n "${eks_internet_gateway_id}" && "${eks_internet_gateway_id}" != "None" ]]; then
+              import_resource "aws_internet_gateway.eks" "${eks_internet_gateway_id}"
+            fi
 
             read -r -a eks_private_subnet_ids <<< "$(aws ec2 describe-subnets \
               --filters \
@@ -117,6 +157,81 @@ jobs:
                 "aws_subnet.eks_private[${index}]" \
                 "${eks_private_subnet_ids[${index}]}"
             done
+
+            read -r -a eks_public_subnet_ids <<< "$(aws ec2 describe-subnets \
+              --filters \
+                "Name=vpc-id,Values=${eks_vpc_id}" \
+                "Name=tag:kubernetes.io/role/elb,Values=1" \
+              --query 'sort_by(Subnets, &AvailabilityZone)[].SubnetId' \
+              --output text)"
+
+            for index in "${!eks_public_subnet_ids[@]}"; do
+              import_resource \
+                "aws_subnet.eks_public[${index}]" \
+                "${eks_public_subnet_ids[${index}]}"
+            done
+
+            eks_public_route_table_id="$(aws ec2 describe-route-tables \
+              --filters \
+                "Name=vpc-id,Values=${eks_vpc_id}" \
+                "Name=tag:Name,Values=eks-20260901-public" \
+              --query 'RouteTables[0].RouteTableId' \
+              --output text)"
+            if [[ -n "${eks_public_route_table_id}" && "${eks_public_route_table_id}" != "None" ]]; then
+              import_resource "aws_route_table.eks_public" "${eks_public_route_table_id}"
+            fi
+
+            eks_private_route_table_id="$(aws ec2 describe-route-tables \
+              --filters \
+                "Name=vpc-id,Values=${eks_vpc_id}" \
+                "Name=tag:Name,Values=eks-20260901-private" \
+              --query 'RouteTables[0].RouteTableId' \
+              --output text)"
+            if [[ -n "${eks_private_route_table_id}" && "${eks_private_route_table_id}" != "None" ]]; then
+              import_resource "aws_route_table.eks_private" "${eks_private_route_table_id}"
+            fi
+
+            eks_nat_gateway_id="$(aws ec2 describe-nat-gateways \
+              --filter \
+                "Name=vpc-id,Values=${eks_vpc_id}" \
+                "Name=tag:Name,Values=eks-20260901-nat" \
+              --query 'NatGateways[?State==`available`].NatGatewayId | [0]' \
+              --output text)"
+            if [[ -n "${eks_nat_gateway_id}" && "${eks_nat_gateway_id}" != "None" ]]; then
+              import_resource "aws_nat_gateway.eks" "${eks_nat_gateway_id}"
+
+              eks_nat_eip_allocation_id="$(aws ec2 describe-nat-gateways \
+                --nat-gateway-ids "${eks_nat_gateway_id}" \
+                --query 'NatGateways[0].NatGatewayAddresses[0].AllocationId' \
+                --output text)"
+              if [[ -n "${eks_nat_eip_allocation_id}" && "${eks_nat_eip_allocation_id}" != "None" ]]; then
+                import_resource "aws_eip.eks_nat" "${eks_nat_eip_allocation_id}"
+              fi
+            fi
+
+            if [[ -n "${eks_public_route_table_id}" && "${eks_public_route_table_id}" != "None" ]]; then
+              for index in "${!eks_public_subnet_ids[@]}"; do
+                association_id="$(aws ec2 describe-route-tables \
+                  --route-table-ids "${eks_public_route_table_id}" \
+                  --query "RouteTables[0].Associations[?SubnetId=='${eks_public_subnet_ids[${index}]}'].RouteTableAssociationId | [0]" \
+                  --output text)"
+                if [[ -n "${association_id}" && "${association_id}" != "None" ]]; then
+                  import_resource "aws_route_table_association.eks_public[${index}]" "${association_id}"
+                fi
+              done
+            fi
+
+            if [[ -n "${eks_private_route_table_id}" && "${eks_private_route_table_id}" != "None" ]]; then
+              for index in "${!eks_private_subnet_ids[@]}"; do
+                association_id="$(aws ec2 describe-route-tables \
+                  --route-table-ids "${eks_private_route_table_id}" \
+                  --query "RouteTables[0].Associations[?SubnetId=='${eks_private_subnet_ids[${index}]}'].RouteTableAssociationId | [0]" \
+                  --output text)"
+                if [[ -n "${association_id}" && "${association_id}" != "None" ]]; then
+                  import_resource "aws_route_table_association.eks_private[${index}]" "${association_id}"
+                fi
+              done
+            fi
           fi
 
           terraform_role_arn="$(aws iam get-role \
