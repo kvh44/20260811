@@ -224,8 +224,35 @@ jobs:
             --name "${{ vars.EKS_CLUSTER_NAME }}" \
             --region "${{ vars.AWS_REGION }}"
 
+      - name: Import existing Argo CD Helm releases
+        if: ${{ inputs.operation == 'apply' }}
+        shell: bash
+        run: |
+          helm_namespace="argocd"
+
+          import_helm_release() {
+            local address="$1"
+            local release_name="$2"
+
+            if ! terraform state list | grep -Fxq "${address}"; then
+              if kubectl get secret \
+                --namespace "${helm_namespace}" \
+                --selector "owner=helm,name=${release_name}" \
+                --no-headers 2>/dev/null | grep -q .; then
+                terraform import -input=false \
+                  "${address}" \
+                  "${helm_namespace}/${release_name}"
+              fi
+            fi
+          }
+
+          import_helm_release "helm_release.argocd" "argocd"
+          import_helm_release "helm_release.argocd_application" "argocd-application"
+
       - name: Terraform install Argo CD
         if: ${{ inputs.operation == 'apply' }}
         run: |
-          terraform plan -input=false -lock-timeout=5m -out=tfplan-argocd
+          terraform plan -input=false -lock-timeout=5m \
+            -target=helm_release.argocd_application \
+            -out=tfplan-argocd
           terraform apply -input=false -auto-approve tfplan-argocd
