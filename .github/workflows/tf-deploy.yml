@@ -13,11 +13,6 @@ on:
           - plan
           - apply
           - destroy
-      confirm_destroy:
-        description: Permanently destroy every resource tracked in the Terraform state.
-        required: true
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -30,7 +25,7 @@ concurrency:
 jobs:
   terraform:
     name: Terraform ${{ inputs.operation }}
-    if: ${{ inputs.operation != 'destroy' || inputs.confirm_destroy }}
+    if: ${{ inputs.operation != 'destroy' }}
     runs-on: ubuntu-latest
     defaults:
       run:
