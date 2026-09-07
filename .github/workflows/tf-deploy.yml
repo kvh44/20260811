@@ -307,6 +307,13 @@ jobs:
             fi
           fi
 
+      - name: Configure kubeconfig for Terraform destroy
+        if: ${{ inputs.operation == 'destroy' }}
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ vars.EKS_CLUSTER_NAME }}" \
+            --region "${{ vars.AWS_REGION }}"
+
       - name: Terraform destroy
         if: ${{ inputs.operation == 'destroy' }}
         run: |
