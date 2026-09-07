@@ -13,11 +13,6 @@ on:
           - plan
           - apply
           - destroy
-      confirm_destroy:
-        description: Permanently destroy every resource tracked in the Terraform state.
-        required: true
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -30,7 +25,7 @@ concurrency:
 jobs:
   terraform:
     name: Terraform ${{ inputs.operation }}
-    if: ${{ inputs.operation != 'destroy' || inputs.confirm_destroy }}
+    if: ${{ inputs.operation != 'destroy' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -306,6 +301,13 @@ jobs:
               terraform import -input=false "${eks_log_group_address}" "${eks_log_group_name}"
             fi
           fi
+
+      - name: Configure kubeconfig for Terraform destroy
+        if: ${{ inputs.operation == 'destroy' }}
+        run: |
+          aws eks update-kubeconfig \
+            --name "${{ vars.EKS_CLUSTER_NAME }}" \
+            --region "${{ vars.AWS_REGION }}"
 
       - name: Terraform destroy
         if: ${{ inputs.operation == 'destroy' }}
