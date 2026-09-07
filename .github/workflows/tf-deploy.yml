@@ -12,6 +12,12 @@ on:
           - init
           - plan
           - apply
+          - destroy
+      confirm_destroy:
+        description: Permanently destroy every resource tracked in the Terraform state.
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -24,6 +30,7 @@ concurrency:
 jobs:
   terraform:
     name: Terraform ${{ inputs.operation }}
+    if: ${{ inputs.operation != 'destroy' || inputs.confirm_destroy }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -55,6 +62,11 @@ jobs:
           state_bucket="20260811-${aws_account_id}-${{ vars.AWS_REGION }}-terraform-state"
 
           if ! aws s3api head-bucket --bucket "${state_bucket}" 2>/dev/null; then
+            if [[ "${{ inputs.operation }}" == "destroy" ]]; then
+              echo "Terraform state bucket does not exist: ${state_bucket}" >&2
+              exit 1
+            fi
+
             aws s3api create-bucket \
               --bucket "${state_bucket}" \
               --region "${{ vars.AWS_REGION }}" \
@@ -83,6 +95,7 @@ jobs:
             -backend-config="use_lockfile=true"
 
       - name: Import existing Terraform-managed AWS resources
+        if: ${{ inputs.operation != 'destroy' }}
         shell: bash
         run: |
           oidc_provider_address="aws_iam_openid_connect_provider.github_actions"
@@ -293,6 +306,12 @@ jobs:
               terraform import -input=false "${eks_log_group_address}" "${eks_log_group_name}"
             fi
           fi
+
+      - name: Terraform destroy
+        if: ${{ inputs.operation == 'destroy' }}
+        run: |
+          terraform plan -destroy -input=false -lock-timeout=5m -out=tfplan-destroy
+          terraform apply -input=false -auto-approve tfplan-destroy
 
       - name: Terraform plan
         if: ${{ inputs.operation == 'plan' }}

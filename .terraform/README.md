@@ -58,6 +58,10 @@ enables versioning, encryption, and S3 lock files, then uses
 `terraform/20260811.tfstate` as its remote state. This state is required for
 GitHub-hosted runners to retain imported and created resources between runs.
 
+To remove the infrastructure, manually run `tf-deploy.yml` with the `destroy`
+operation and select the `confirm_destroy` checkbox. Terraform destroys only
+resources tracked in its remote state; the versioned S3 state bucket is retained.
+
 Set the resulting values in GitHub **Settings → Secrets and variables →
 Actions → Variables**. In particular, `AWS_ROLE_TO_ASSUME`, `AWS_REGION`,
 `EKS_ECR_REPOSITORY`, and `EKS_CLUSTER_NAME` are required by both EKS
