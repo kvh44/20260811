@@ -1,10 +1,10 @@
 package com.example._0260811.service;
 
-import com.example._0260811.model.Dockerclient;
+import com.example._0260811.model.MysqlClient;
 
 import java.util.List;
 
 public interface MysqlService {
-    Dockerclient getDockerclientById(long id);
-    List<Dockerclient> getAllDockerclients();
+    MysqlClient getMysqlClientById(long id);
+    List<MysqlClient> getAllMysqlClients();
 }

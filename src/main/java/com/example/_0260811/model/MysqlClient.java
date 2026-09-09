@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Data
-public class Dockerclient {
+public class MysqlClient {
     @Id @NotNull Long id;
     @NotNull String username;
     @NotNull String email;

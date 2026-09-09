@@ -1,7 +1,7 @@
 package com.example._0260811.service;
 
-import com.example._0260811.model.Dockerclient;
-import com.example._0260811.repository.DockerclientRepository;
+import com.example._0260811.model.MysqlClient;
+import com.example._0260811.repository.MysqlClientRepository;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,14 +19,14 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MysqlServiceImplTest {
     @Mock
-    private DockerclientRepository dockerclientRepository;
+    private MysqlClientRepository dockerclientRepository;
 
     @InjectMocks
     private MysqlServiceImpl mysqlService;
 
     @Resource
-    private final List<Dockerclient> dockerclients = IntStream.rangeClosed(1, 10)
-            .mapToObj(i -> Dockerclient.builder()
+    private final List<MysqlClient> dockerclients = IntStream.rangeClosed(1, 10)
+            .mapToObj(i -> MysqlClient.builder()
                     .id((long) i)
                     .username("docker-client-" + i)
                     .email("docker" + i + "@example.com")
@@ -36,7 +36,7 @@ public class MysqlServiceImplTest {
 
     @Test
     public void testGetDockerclientById() {
-        Dockerclient dockerclient = Dockerclient.builder()
+        MysqlClient dockerclient = MysqlClient.builder()
                 .id(1L)
                 .username("Test Docker Client")
                 .email("abc@gmail.com")
@@ -45,7 +45,7 @@ public class MysqlServiceImplTest {
 
         when(dockerclientRepository.findById(1L)).thenReturn(Optional.of(dockerclient));
 
-        Dockerclient result = mysqlService.getDockerclientById(1L);
+        MysqlClient result = mysqlService.getMysqlClientById(1L);
 
         assertEquals(dockerclient.getId(), result.getId());
         assertEquals(dockerclient.getUsername(), result.getUsername());
@@ -57,7 +57,7 @@ public class MysqlServiceImplTest {
     public void testGetDockerclientByIdNotFound() {
         when(dockerclientRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> mysqlService.getDockerclientById(1L));
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> mysqlService.getMysqlClientById(1L));
         assertEquals("Docker client not found with id: 1", ex.getMessage());
     }
 
@@ -65,7 +65,7 @@ public class MysqlServiceImplTest {
     public void testGetAllDockerclients() {
         when(dockerclientRepository.findAll()).thenReturn(dockerclients);
 
-        List<Dockerclient> result = mysqlService.getAllDockerclients();
+        List<MysqlClient> result = mysqlService.getAllMysqlClients();
 
         assertEquals(10, result.size());
         assertEquals(1L, result.get(0).getId());
