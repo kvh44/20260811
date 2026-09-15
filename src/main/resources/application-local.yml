@@ -1,4 +1,6 @@
 spring:
+  main:
+    lazy-initialization: true
   datasource:
     url: ${LOCAL_DB_URL:jdbc:mysql://localhost:3306/appdb}
     username: ${LOCAL_DB_USERNAME:appuser}
@@ -7,9 +9,5 @@ spring:
     hikari:
       initialization-fail-timeout: -1
       connection-timeout: 3000
-data:
-  mongo:
-    uri: ${LOCAL_MONGO_URI:mongodb://localhost:27017/appdb}
-    host: ${LOCAL_MONGO_HOST:localhost}
-    port: ${LOCAL_MONGO_PORT:27017}
-    database: ${LOCAL_MONGO_DATABASE:appdb}
+  mongodb:
+    uri: ${LOCAL_MONGO_URI:mongodb://root:rootpassword@localhost:27017/appdb?authSource=admin}
