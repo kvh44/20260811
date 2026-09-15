@@ -190,6 +190,19 @@ docker compose -f compose.mysql.yml -f compose.app.yml down
 Stop docker and delete data:
 docker compose -f compose.mysql.yml -f compose.app.yml down -v
 
+
+Use MongoDB in docker
+-------------------------
+Start app and mongodb in docker:
+docker compose -f compose.mongo.yml up -d
+
+Test MongoDB connection:
+docker compose -f compose.mongo.yml exec mongo mongosh --username root --password rootpassword --authenticationDatabase admin --eval 'db.adminCommand({ ping: 1 })'
+
+Create the `appdb` database index and seed 100 MongoDB users:
+docker compose -f compose.mongo.yml exec -T mongo mongosh --username root --password rootpassword --authenticationDatabase admin appdb < init.mongo.js
+
+
 Others:
 -------------------------
 Expose Ecs on public internet: https://www.youtube.com/watch?v=3b1--mUhUhI

@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler({ConnectException.class, CannotGetJdbcConnectionException.class, CannotCreateTransactionException.class})
+    @ExceptionHandler({ConnectException.class, CannotGetJdbcConnectionException.class, CannotCreateTransactionException.class, org.springframework.data.mongodb.UncategorizedMongoDbException.class})
     public ResponseEntity<Map<String, Object>> handleConnectException(Exception ex, HttpServletRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", "ConnectException");
