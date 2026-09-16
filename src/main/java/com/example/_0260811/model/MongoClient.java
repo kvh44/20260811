@@ -1,5 +1,6 @@
 package com.example._0260811.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,10 @@ public class MongoClient {
     @Id
     private String id;
     @NotNull
+    @Column(unique = true)
     private String name;
     @NotNull
+    @Column(unique = true)
     private String email;
+    private Long relationId;
 }

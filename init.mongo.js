@@ -16,7 +16,8 @@ const operations = Array.from({ length: 100 }, (_, index) => {
       update: {
         $set: {
           name: `User ${number}`,
-          email
+          email,
+          relationId: number
         }
       },
       upsert: true
