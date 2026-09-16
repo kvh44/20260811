@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/mysql")
 @RequiredArgsConstructor
@@ -15,7 +17,12 @@ public class MysqlController {
     private final MysqlService mysqlService;
 
     @GetMapping("/{id}")
-    public MysqlClient getDockerclientById(@PathVariable Long id) {
+    public MysqlClient getMysqlClientById(@PathVariable Long id) {
         return mysqlService.getMysqlClientById(id);
+    }
+
+    @GetMapping("/all")
+    public List<MysqlClient> getAllMysqlClients() {
+        return mysqlService.getAllMysqlClients();
     }
 }

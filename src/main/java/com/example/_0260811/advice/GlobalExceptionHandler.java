@@ -1,6 +1,9 @@
 package com.example._0260811.advice;
 
+import com.mongodb.MongoSocketOpenException;
+import com.mongodb.MongoTimeoutException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -17,7 +20,7 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(NoHandlerFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleNotFoundPage(NoHandlerFoundException ex, HttpServletRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Page not found");
         body.put("status", HttpStatus.NOT_FOUND.value());
@@ -26,7 +29,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
-    @ExceptionHandler({ConnectException.class, CannotGetJdbcConnectionException.class, CannotCreateTransactionException.class})
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<Map<String, Object>> handleDataNotFoundException(Exception ex, HttpServletRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Data not found");
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler({ConnectException.class, CannotGetJdbcConnectionException.class, CannotCreateTransactionException.class, UncategorizedMongoDbException.class, MongoSocketOpenException.class, java.net.ConnectException.class, MongoTimeoutException.class})
     public ResponseEntity<Map<String, Object>> handleConnectException(Exception ex, HttpServletRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", "ConnectException");

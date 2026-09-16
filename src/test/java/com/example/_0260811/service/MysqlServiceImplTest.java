@@ -58,7 +58,7 @@ public class MysqlServiceImplTest {
         when(dockerclientRepository.findById(1L)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> mysqlService.getMysqlClientById(1L));
-        assertEquals("Docker client not found with id: 1", ex.getMessage());
+        assertEquals("Mysql client not found with id: 1", ex.getMessage());
     }
 
     @Test

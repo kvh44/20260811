@@ -1,5 +1,6 @@
 package com.example._0260811.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -17,7 +18,16 @@ import lombok.NoArgsConstructor;
 @Data
 public class MysqlClient {
     @Id @NotNull Long id;
-    @NotNull String username;
-    @NotNull String email;
-    @NotNull String telephone;
+
+    @NotNull
+    @Column(unique = true)
+    String username;
+
+    @NotNull
+    @Column(unique = true)
+    String email;
+
+    @NotNull
+    @Column(unique = true)
+    String telephone;
 }
