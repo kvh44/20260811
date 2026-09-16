@@ -20,12 +20,20 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(NoHandlerFoundException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> handleNotFoundPage(NoHandlerFoundException ex, HttpServletRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("error", "Page not found");
         body.put("status", HttpStatus.NOT_FOUND.value());
         String path = request != null ? request.getRequestURI() : ex.getRequestURL();
         body.put("path", path);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler({RuntimeException.class})
+    public ResponseEntity<Map<String, Object>> handleDataNotFoundException(Exception ex, HttpServletRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("error", "Data not found");
+        body.put("status", HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
