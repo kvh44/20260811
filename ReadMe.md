@@ -25,7 +25,19 @@ or manually:
 
 API
 ---
-GET /users -> returns JSON list of users
+Available endpoints:
+
+- `GET /users` returns the sample users.
+- `GET /mysql/{id}` returns one MySQL client.
+- `GET /mysql/all` returns all MySQL clients.
+- `GET /mongo/all` returns all MongoDB clients.
+
+OpenAPI and Swagger UI are generated from the application at runtime:
+
+- Swagger UI: http://localhost:8001/swagger-ui.html
+- OpenAPI JSON: http://localhost:8001/v3/api-docs
+- OpenAPI YAML: http://localhost:8001/v3/api-docs.yaml
+
 404s are handled by ControllerAdvice returning JSON {"error":"Page not found","status":404,"path":"..."}
 
 Git hooks
