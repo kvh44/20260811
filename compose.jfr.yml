@@ -1,0 +1,7 @@
+services:
+  app:
+    environment:
+      JDK_JAVA_OPTIONS: >-
+        -XX:StartFlightRecording=name=users-api,settings=profile,duration=${JFR_DURATION:-2m},maxsize=${JFR_MAX_SIZE:-256m},dumponexit=true,filename=/app/jfr/users-api-%p-%t.jfr
+    volumes:
+      - ./target/jfr:/app/jfr
