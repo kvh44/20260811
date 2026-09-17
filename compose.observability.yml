@@ -1,0 +1,30 @@
+services:
+  app:
+    depends_on:
+      observability:
+        condition: service_started
+    environment:
+      JAVA_TOOL_OPTIONS: -javaagent:/app/opentelemetry-javaagent.jar
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,metrics
+      OTEL_SERVICE_NAME: users-api
+      OTEL_RESOURCE_ATTRIBUTES: deployment.environment.name=local
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://observability:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: none
+      OTEL_METRIC_EXPORT_INTERVAL: "10000"
+
+  observability:
+    image: grafana/otel-lgtm:0.33.0
+    container_name: 20260811-observability
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - observability-data:/data
+
+volumes:
+  observability-data:

@@ -28,6 +28,8 @@
 	</scm>
 	<properties>
 		<java.version>26</java.version>
+		<jacoco.version>0.8.15</jacoco.version>
+		<opentelemetry-javaagent.version>2.31.1</opentelemetry-javaagent.version>
 		<springdoc.version>3.1.1</springdoc.version>
 		<argLine/>
 	</properties>
@@ -104,6 +106,46 @@
 					<execution>
 						<goals>
 							<goal>properties</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>copy-opentelemetry-javaagent</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>io.opentelemetry.javaagent</groupId>
+									<artifactId>opentelemetry-javaagent</artifactId>
+									<version>${opentelemetry-javaagent.version}</version>
+									<type>jar</type>
+									<outputDirectory>${project.build.directory}/otel</outputDirectory>
+									<destFileName>opentelemetry-javaagent.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>jacoco-prepare-agent</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>

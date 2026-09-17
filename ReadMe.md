@@ -40,6 +40,60 @@ OpenAPI and Swagger UI are generated from the application at runtime:
 
 404s are handled by ControllerAdvice returning JSON {"error":"Page not found","status":404,"path":"..."}
 
+Test coverage and observability
+-------------------------------
+Generate the JaCoCo test coverage report:
+
+  ./mvnw clean verify
+
+Open `target/site/jacoco/index.html` to inspect package, class, line, branch,
+and method coverage. The build measures coverage but does not enforce a minimum
+threshold.
+
+Record CPU samples, allocations, garbage collection, and memory activity with
+Java Flight Recorder (JFR):
+
+  ./profile-jfr.sh
+
+The script uses the `local` Spring profile by default and records for two
+minutes. Generate representative traffic while it runs. Override the bounded
+recording with `JFR_DURATION=5m` or `JFR_MAX_SIZE=512m`. Recordings are written
+under `target/jfr/` and can be inspected with JDK Mission Control or the JDK 26
+CLI:
+
+  jfr summary target/jfr/<recording.jfr>
+  jfr view --width 160 hot-methods target/jfr/<recording.jfr>
+  jfr view allocation-by-site target/jfr/<recording.jfr>
+
+JFR recordings can contain JVM properties, environment metadata, and code
+details. Treat them as sensitive diagnostic artifacts; they are excluded from
+both Git and the Docker build context through `target/`.
+
+To profile the Docker application instead:
+
+  mkdir -p target/jfr
+  docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.jfr.yml up --build
+
+Start the local OpenTelemetry APM stack (Collector, Tempo traces, Prometheus
+metrics, and Grafana):
+
+  docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.observability.yml up --build
+
+Call `http://localhost:8001/users`, then open Grafana at
+`http://localhost:3000` (default login: `admin` / `admin`). Use Explore with
+Tempo to inspect request/database traces and Prometheus to inspect request
+latency, JVM CPU, GC, and memory metrics. The local Actuator metrics index is
+also available at `http://localhost:8001/actuator/metrics` while this overlay is
+active.
+
+JFR and APM can run together because they use separate JVM options:
+
+  mkdir -p target/jfr
+  docker compose -f compose.app.yml -f compose.mysql.yml -f compose.observability.yml -f compose.jfr.yml up --build
+
+These observability overlays are intended for local development. Stop the
+stack with the same Compose file list followed by `down`.
+
 Git hooks
 ---------
 Install local commit-msg hook (enforces "#123456: message detail"):
