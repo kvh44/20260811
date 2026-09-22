@@ -260,6 +260,9 @@ docker compose -f compose.mysql.yml -f compose.app.yml down -v
 Use MongoDB in docker
 -------------------------
 Start app and mongodb in docker:
+docker compose -f compose.app.yml -f compose.mongo.yml up -d --build --wait
+
+Or start only MongoDB:
 docker compose -f compose.mongo.yml up -d
 
 Test MongoDB connection:
@@ -268,6 +271,12 @@ docker compose -f compose.mongo.yml exec mongo mongosh --username root --passwor
 Create the `appdb` database index and seed 100 MongoDB users:
 docker compose -f compose.mongo.yml exec -T mongo mongosh --username root --password rootpassword --authenticationDatabase admin appdb < init.mongo.js
 
+
+Use all in docker
+-------------------------
+Start app, mysql and mongodb in docker:
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.observability.yml up --build
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.observability.yml ps
 
 Others:
 -------------------------
