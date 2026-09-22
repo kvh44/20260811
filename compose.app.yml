@@ -6,15 +6,13 @@ services:
     container_name: 20260811-container
     restart: unless-stopped
 
-    depends_on:
-      mysql:
-        condition: service_healthy
-
     environment:
       SPRING_PROFILES_ACTIVE: local
       LOCAL_DB_URL: jdbc:mysql://mysql:3306/appdb
       LOCAL_DB_USERNAME: appuser
       LOCAL_DB_PASSWORD: apppassword
+      MONGO_INITDB_ROOT_USERNAME: root
+      LOCAL_MONGO_URI: mongodb://root:rootpassword@mongo:27017/appdb?authSource=admin
 
     ports:
       - "8001:8001"
