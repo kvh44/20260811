@@ -1,6 +1,8 @@
 spring:
   main:
     lazy-initialization: true
+  cache:
+    type: redis
   datasource:
     url: ${LOCAL_DB_URL:jdbc:mysql://localhost:3306/appdb}
     username: ${LOCAL_DB_USERNAME:appuser}
@@ -11,3 +13,11 @@ spring:
       connection-timeout: 3000
   mongodb:
     uri: ${LOCAL_MONGO_URI:mongodb://root:rootpassword@localhost:27017/appdb?authSource=admin}
+  data:
+    redis:
+      host: ${LOCAL_REDIS_HOST:localhost}
+      port: ${LOCAL_REDIS_PORT:6379}
+      password: ${LOCAL_REDIS_PASSWORD:}
+      database: ${LOCAL_REDIS_DATABASE:0}
+      timeout: ${LOCAL_REDIS_READ_TIMEOUT:2s}
+      connect-timeout: ${LOCAL_REDIS_CONNECT_TIMEOUT:2s}

@@ -7,4 +7,6 @@ import java.util.List;
 public interface MysqlService {
     MysqlClient getMysqlClientById(long id);
     List<MysqlClient> getAllMysqlClients();
+    void deleteMysqlClientById(long id);
+    void deleteAllMysqlClients();
 }
