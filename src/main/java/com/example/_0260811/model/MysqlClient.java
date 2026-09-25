@@ -10,13 +10,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Entity
 @Table(name = "dockerclient")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Data
-public class MysqlClient {
+public class MysqlClient implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Id @NotNull Long id;
 
     @NotNull

@@ -13,6 +13,8 @@ services:
       LOCAL_DB_PASSWORD: apppassword
       MONGO_INITDB_ROOT_USERNAME: root
       LOCAL_MONGO_URI: mongodb://root:rootpassword@mongo:27017/appdb?authSource=admin
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
 
     ports:
       - "8001:8001"

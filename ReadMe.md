@@ -272,11 +272,36 @@ Create the `appdb` database index and seed 100 MongoDB users:
 docker compose -f compose.mongo.yml exec -T mongo mongosh --username root --password rootpassword --authenticationDatabase admin appdb < init.mongo.js
 
 
+Use Redis in docker
+-------------------------
+Start Redis:
+docker compose -f compose.redis.yml up -d --wait
+
+Test the Redis connection (expected: `PONG`):
+docker compose -f compose.redis.yml exec redis redis-cli ping
+
+The local Spring profile uses 2-second Redis read and connection timeouts (override with
+`LOCAL_REDIS_READ_TIMEOUT` and `LOCAL_REDIS_CONNECT_TIMEOUT`). Lettuce does not
+automatically reconnect or queue commands while disconnected.
+If a Redis connection fails, the app serves MySQL requests without caching for the rest
+of the process. Restart the app to enable Redis caching again.
+
+List Redis keys:
+docker compose -f compose.redis.yml exec redis redis-cli --scan
+
+Start the app with MySQL and Redis to cache MySQL clients:
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.redis.yml up -d --build --wait
+
+After the MySQL database is initialized, load the list and check the Redis key (`1` means present):
+curl -f http://localhost:8001/mysql/all
+docker compose -f compose.redis.yml exec redis redis-cli EXISTS all
+
+
 Use all in docker
 -------------------------
-Start app, mysql and mongodb in docker:
-docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.observability.yml up --build
-docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.observability.yml ps
+Start app, MySQL, MongoDB, Redis and observability in docker:
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.redis.yml -f compose.observability.yml up --build
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.redis.yml -f compose.observability.yml ps
 
 Others:
 -------------------------
