@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 public class RedisCacheConfig implements CachingConfigurer {
 
     private final ObjectProvider<CacheManager> cacheManagerProvider;
-    private final RedisConnectionCacheErrorHandler redisErrorHandler = new RedisConnectionCacheErrorHandler();
+    private final RedisCacheFailureHandler redisErrorHandler = new RedisCacheFailureHandler();
     private final CacheResolver noOpCacheResolver = new SimpleCacheResolver(new NoOpCacheManager());
 
     public RedisCacheConfig(ObjectProvider<CacheManager> cacheManagerProvider) {

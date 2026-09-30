@@ -283,8 +283,9 @@ docker compose -f compose.redis.yml exec redis redis-cli ping
 The local Spring profile uses 2-second Redis read and connection timeouts (override with
 `LOCAL_REDIS_READ_TIMEOUT` and `LOCAL_REDIS_CONNECT_TIMEOUT`). Lettuce does not
 automatically reconnect or queue commands while disconnected.
-If a Redis connection fails, the app serves MySQL requests without caching for the rest
-of the process. Restart the app to enable Redis caching again.
+If a Redis cache operation raises `RedisConnectionFailureException` or
+`RedisSystemException`, the app serves MySQL requests without caching for the rest of
+the process. Restart the app to enable Redis caching again.
 
 List Redis keys:
 docker compose -f compose.redis.yml exec redis redis-cli --scan

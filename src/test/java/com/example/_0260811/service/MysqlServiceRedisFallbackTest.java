@@ -12,6 +12,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -82,9 +83,38 @@ class MysqlServiceRedisFallbackTest {
     }
 
     @Test
+    void readsFromMysqlWhenRedisSystemExceptionOccursOnCacheGet() {
+        MysqlClient client = MysqlClient.builder().id(1L).build();
+        RedisSystemException failure = new RedisSystemException("Redis unavailable", new RuntimeException());
+        doThrow(failure).when(cache).get(any());
+        when(repository.findById(1L)).thenReturn(Optional.of(client));
+
+        assertSame(client, mysqlService.getMysqlClientById(1L));
+        assertSame(client, mysqlService.getMysqlClientById(1L));
+
+        verify(repository, times(2)).findById(1L);
+        verify(cache, times(1)).get(1L);
+    }
+
+    @Test
     void bypassesRedisAfterCachePutFailure() {
         List<MysqlClient> clients = List.of(MysqlClient.builder().id(1L).build());
         doReturn(null).when(cache).get(any());
+        when(repository.findAll()).thenReturn(clients);
+
+        assertEquals(clients, mysqlService.getAllMysqlClients());
+        assertEquals(clients, mysqlService.getAllMysqlClients());
+
+        verify(repository, times(2)).findAll();
+        verify(cache, times(1)).get("all");
+    }
+
+    @Test
+    void readsFromMysqlWhenRedisSystemExceptionOccursOnCachePut() {
+        List<MysqlClient> clients = List.of(MysqlClient.builder().id(1L).build());
+        RedisSystemException failure = new RedisSystemException("Redis unavailable", new RuntimeException());
+        doReturn(null).when(cache).get(any());
+        doThrow(failure).when(cache).put(any(), any());
         when(repository.findAll()).thenReturn(clients);
 
         assertEquals(clients, mysqlService.getAllMysqlClients());
