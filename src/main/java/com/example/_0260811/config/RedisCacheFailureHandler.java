@@ -7,10 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.CacheErrorHandler;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.RedisSystemException;
 
-public class RedisConnectionCacheErrorHandler implements CacheErrorHandler {
+public class RedisCacheFailureHandler implements CacheErrorHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(RedisConnectionCacheErrorHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisCacheFailureHandler.class);
     private final AtomicBoolean unavailable = new AtomicBoolean();
 
     boolean isUnavailable() {
@@ -19,30 +20,31 @@ public class RedisConnectionCacheErrorHandler implements CacheErrorHandler {
 
     @Override
     public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
-        handleConnectionFailure(exception, cache, "read");
+        handleRedisFailure(exception, cache, "read");
     }
 
     @Override
     public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
-        handleConnectionFailure(exception, cache, "write");
+        handleRedisFailure(exception, cache, "write");
     }
 
     @Override
     public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
-        handleConnectionFailure(exception, cache, "eviction");
+        handleRedisFailure(exception, cache, "eviction");
     }
 
     @Override
     public void handleCacheClearError(RuntimeException exception, Cache cache) {
-        handleConnectionFailure(exception, cache, "clear");
+        handleRedisFailure(exception, cache, "clear");
     }
 
-    private void handleConnectionFailure(RuntimeException exception, Cache cache, String operation) {
-        if (!(exception instanceof RedisConnectionFailureException)) {
+    private void handleRedisFailure(RuntimeException exception, Cache cache, String operation) {
+        if (!(exception instanceof RedisConnectionFailureException)
+                && !(exception instanceof RedisSystemException)) {
             throw exception;
         }
         if (unavailable.compareAndSet(false, true)) {
-            log.warn("Redis unavailable during cache {} for '{}'; bypassing Redis until restart and continuing with MySQL: {}",
+            log.warn("Redis cache failed during {} for '{}'; bypassing Redis until restart and continuing with MySQL: {}",
                     operation, cache.getName(), exception.getMessage());
         }
     }
