@@ -15,6 +15,7 @@ import java.util.List;
 public class MysqlServiceImpl implements MysqlService {
 
     final private MysqlClientRepository mysqlClientRepository;
+    final private KafkaProducer kafkaProducer;
 
     @Override
     @Cacheable(value = "mysqlClient", key = "#id")
@@ -43,5 +44,11 @@ public class MysqlServiceImpl implements MysqlService {
     })
     public void deleteAllMysqlClients() {
         mysqlClientRepository.deleteAll();
+    }
+
+    @Override
+    public void saveMysqlClient(MysqlClient mysqlClient) {
+        mysqlClient = mysqlClientRepository.save(mysqlClient);
+        kafkaProducer.sendMessage("Saved MysqlClient with id: " + mysqlClient.getId());
     }
 }

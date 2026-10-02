@@ -9,4 +9,5 @@ public interface MysqlService {
     List<MysqlClient> getAllMysqlClients();
     void deleteMysqlClientById(long id);
     void deleteAllMysqlClients();
+    void saveMysqlClient(MysqlClient mysqlClient);
 }

@@ -3,7 +3,7 @@ services:
     build:
       context: .
     image: "20260811"
-    container_name: 20260811-container
+    container_name: container-20260811
     restart: unless-stopped
 
     environment:

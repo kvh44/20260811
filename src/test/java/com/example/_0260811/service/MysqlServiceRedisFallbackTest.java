@@ -170,8 +170,13 @@ class MysqlServiceRedisFallbackTest {
         }
 
         @Bean
-        MysqlService mysqlService(MysqlClientRepository repository) {
-            return new MysqlServiceImpl(repository);
+        KafkaProducer kafkaProducer() {
+            return mock(KafkaProducer.class);
+        }
+
+        @Bean
+        MysqlService mysqlService(MysqlClientRepository repository, KafkaProducer kafkaProducer) {
+            return new MysqlServiceImpl(repository, kafkaProducer);
         }
 
         @Bean

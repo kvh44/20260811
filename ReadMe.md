@@ -298,11 +298,51 @@ curl -f http://localhost:8001/mysql/all
 docker compose -f compose.redis.yml exec redis redis-cli EXISTS all
 
 
+Use Kafka in docker
+-------------------------
+Start the Kafka broker and inspect its logs; wait until startup is complete before
+running the following commands:
+
+```bash
+docker compose -f compose.kafka.yml up -d
+docker compose -f compose.kafka.yml logs kafka
+```
+
+The application topic is `topic20260930`. Spring creates it when the app can reach
+Kafka; to create it manually, or list and inspect topics, run:
+
+```bash
+docker compose -f compose.kafka.yml exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --if-not-exists --topic topic20260930 --partitions 1 --replication-factor 1
+docker compose -f compose.kafka.yml exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+docker compose -f compose.kafka.yml exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic topic20260930
+```
+
+Send one message, then read retained messages (press Ctrl-C to stop the consumer):
+
+```bash
+printf 'hello from CLI\n' | docker compose -f compose.kafka.yml exec -T kafka /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic topic20260930
+docker compose -f compose.kafka.yml exec kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic topic20260930 --from-beginning
+```
+
+List consumer groups, or delete the topic and **all** its messages when you want to
+reset it:
+
+```bash
+docker compose -f compose.kafka.yml exec kafka /opt/kafka/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+docker compose -f compose.kafka.yml exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic topic20260930
+```
+
+These commands run inside the Kafka container, where `localhost:9092` is the broker.
+In the combined Compose stack, the app's `localhost:9092` points to the app container,
+and the broker also advertises `localhost:9092`. App-to-Kafka publishing needs a
+container-reachable bootstrap address and advertised listener.
+
+
 Use all in docker
 -------------------------
-Start app, MySQL, MongoDB, Redis and observability in docker:
-docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.redis.yml -f compose.observability.yml up --build
-docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.redis.yml -f compose.observability.yml ps
+Start app, MySQL, MongoDB, Redis, Kafka and observability in docker:
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.redis.yml -f compose.observability.yml -f compose.kafka.yml up --build
+docker compose -f compose.app.yml -f compose.mysql.yml -f compose.mongo.yml -f compose.redis.yml -f compose.observability.yml -f compose.kafka.yml ps
 
 Others:
 -------------------------

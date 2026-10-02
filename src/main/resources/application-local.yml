@@ -21,3 +21,13 @@ spring:
       database: ${LOCAL_REDIS_DATABASE:0}
       timeout: ${LOCAL_REDIS_READ_TIMEOUT:2s}
       connect-timeout: ${LOCAL_REDIS_CONNECT_TIMEOUT:2s}
+  kafka:
+    bootstrap-servers: ${LOCAL_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: ${LOCAL_KAFKA_CONSUMER_GROUP_ID:local-consumer-group}
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
